@@ -85,7 +85,7 @@ void PID_rest(pid_t* pid);
 
 		
 
-		
+extern pid_t pid_yaw_spd;
 extern pid_t pid_pit[2];
 extern pid_t pid_yaw[2];
 extern pid_t pid_chassis;

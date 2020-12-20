@@ -68,11 +68,11 @@ void MX_FREERTOS_Init(void);
 
 /* Private user code ---------------------------------------------------------*/
 /* USER CODE BEGIN 0 */
-uint8_t originData[5] ={0};	//Debug串口接收到的原始数据
+uint8_t originData[5] = {0}; //Debug串口接收到的原始数据
 uint8_t DebugRevFlag;
 
 uint8_t USART3_temp[VISION_LENGTH];
-uint8_t UART6_temp[11];
+uint8_t UART6_temp[VISION_LENGTH];
 /* USER CODE END 0 */
 
 /**
@@ -119,11 +119,11 @@ int main(void)
   /* USER CODE BEGIN 2 */
 
   system_Init();
-	//HAL_UART_Receive_IT(&huart3,(uint8_t *)USART3_temp,VISION_LENGTH);
-	HAL_UART_Receive_IT(&huart8,originData,5); 
-	HAL_UART_Receive_IT(&huart6,(uint8_t *)UART6_temp,11); //串口�?螺仪				
-	HAL_UART_Receive_IT(&huart3,(uint8_t *)USART3_temp,VISION_LENGTH); //视觉
-	HAL_UART_Receive_IT(&huart7,&ano_data_rec,1); //串口7-匿名上位�?
+  //HAL_UART_Receive_IT(&huart3,(uint8_t *)USART3_temp,VISION_LENGTH);
+  HAL_UART_Receive_IT(&huart8, originData, 5);
+  HAL_UART_Receive_IT(&huart6, (uint8_t *)UART6_temp, VISION_LENGTH);          //视觉
+  
+  HAL_UART_Receive_IT(&huart7, &ano_data_rec, 1);                      //串口7-匿名上位�?
   /* USER CODE END 2 */
 
   /* Init scheduler */
@@ -136,12 +136,12 @@ int main(void)
   /* Infinite loop */
   /* USER CODE BEGIN WHILE */
 
-    while (1)
-    {
+  while (1)
+  {
     /* USER CODE END WHILE */
 
     /* USER CODE BEGIN 3 */
-    }
+  }
   /* USER CODE END 3 */
 }
 
@@ -191,66 +191,39 @@ void SystemClock_Config(void)
 /* USER CODE BEGIN 4 */
 void HAL_UART_RxCpltCallback(UART_HandleTypeDef *huart)
 {
-    UNUSED(huart);
-	
-		if (huart->Instance == USART3)
-		{
-			Vision_Read_Data(USART3_temp);
-			HAL_UART_Receive_IT(&huart3,(uint8_t *)USART3_temp,VISION_LENGTH);
-		}
-		
-    if (huart->Instance == USART6)
-    {
-      if(UART6_temp[0]==0x55)       //帧头
-			{
-				switch(UART6_temp[1])
-				{                
-					 case 0x51: //标识这个包是加�?�度
-							mpu_data.a[0] = ((short)(UART6_temp[3]<<8 | UART6_temp[2]))/32768.0*16;      //X轴加速度
-							mpu_data.a[1] = ((short)(UART6_temp[5]<<8 | UART6_temp[4]))/32768.0*16;      //Y轴加速度
-							mpu_data.a[2] = ((short)(UART6_temp[7]<<8 | UART6_temp[6]))/32768.0*16;      //Z轴加速度
-							mpu_data.T    = ((short)(UART6_temp[9]<<8 | UART6_temp[8]))/340.0+36.25;      //温度
-							break;
-					 case 0x52: //标识这个包是角加速度
-							mpu_data.w[0] = ((short)(UART6_temp[3]<<8| UART6_temp[2]))/32768.0*2000;      //X轴角速度
-							mpu_data.w[1] = ((short)(UART6_temp[5]<<8| UART6_temp[4]))/32768.0*2000;      //Y轴角速度
-							mpu_data.w[2] = ((short)(UART6_temp[7]<<8| UART6_temp[6]))/32768.0*2000;      //Z轴角速度
-							mpu_data.T    = ((short)(UART6_temp[9]<<8| UART6_temp[8]))/340.0+36.25;      //温度
-							break;
-					 case 0x53: //标识这个包是角度
-							mpu_data.real_roll = ((short)(UART6_temp[3]<<8| UART6_temp[2]))/32768.0*180;   //X轴滚转角（x 轴）
-							mpu_data.real_pitch = ((short)(UART6_temp[5]<<8| UART6_temp[4]))/32768.0*180;   //Y轴俯仰角（y 轴）
-							mpu_data.real_yaw = ((short)(UART6_temp[7]<<8| UART6_temp[6]))/32768.0*180;   //Z轴偏航角（z 轴）
-							mpu_data.T        = ((short)(UART6_temp[9]<<8| UART6_temp[8]))/340.0+36.25;   //温度
-							//printf("X轴角度：%.2f   Y轴角度：%.2f   Z轴角度：%.2f\r\n",angle[0],angle[1],angle[2]);
-							break;
-					 default:					 
-						 break;
-				}
-			} 
-			HAL_UART_Receive_IT(&huart6,(uint8_t *)UART6_temp,11);
-    }
-	if(huart->Instance == UART7)
-	{
-		ANO_DT_Data_Receive_Prepare(ano_data_rec);
-		HAL_UART_Receive_IT(&huart7,&ano_data_rec,1);
-	}
-	if (huart->Instance == UART8)
-    {
-        DebugRevFlag += 1;
-//        HAL_UART_Receive_IT(&huart6, ReadTemp, VISION_LENGTH);
-    }
+  UNUSED(huart);
+
+  if (huart->Instance == USART3)
+  {
+    
+  }
+
+  if (huart->Instance == USART6)
+  {
+    Vision_Read_Data(UART6_temp);
+    HAL_UART_Receive_IT(&huart6, (uint8_t *)UART6_temp, VISION_LENGTH);
+  }
+  if (huart->Instance == UART7)
+  {
+    ANO_DT_Data_Receive_Prepare(ano_data_rec);
+    HAL_UART_Receive_IT(&huart7, &ano_data_rec, 1);
+  }
+  if (huart->Instance == UART8)
+  {
+    DebugRevFlag += 1;
+    //        HAL_UART_Receive_IT(&huart6, ReadTemp, VISION_LENGTH);
+  }
 }
 int fputc(int ch, FILE *f)
 {
-      HAL_UART_Transmit(&huart8, (uint8_t *)&ch,1, 0xFF);
-      return ch;
+  HAL_UART_Transmit(&huart8, (uint8_t *)&ch, 1, 0xFF);
+  return ch;
 }
 int fgetc(FILE *f)
 {
-	uint8_t  ch;
-	HAL_UART_Receive(&huart1,(uint8_t *)&ch, 1, 0xFFFF);
-	return  ch;
+  uint8_t ch;
+  HAL_UART_Receive(&huart1, (uint8_t *)&ch, 1, 0xFFFF);
+  return ch;
 }
 /* USER CODE END 4 */
 
@@ -282,7 +255,7 @@ void HAL_TIM_PeriodElapsedCallback(TIM_HandleTypeDef *htim)
 void Error_Handler(void)
 {
   /* USER CODE BEGIN Error_Handler_Debug */
-    /* User can add his own implementation to report the HAL error return state */
+  /* User can add his own implementation to report the HAL error return state */
 
   /* USER CODE END Error_Handler_Debug */
 }
@@ -298,7 +271,7 @@ void Error_Handler(void)
 void assert_failed(uint8_t *file, uint32_t line)
 {
   /* USER CODE BEGIN 6 */
-    /* User can add his own implementation to report the file name and line number,
+  /* User can add his own implementation to report the file name and line number,
      tex: printf("Wrong parameters value: file %s on line %d\r\n", file, line) */
   /* USER CODE END 6 */
 }

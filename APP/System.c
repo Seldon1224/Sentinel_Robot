@@ -34,13 +34,12 @@ void system_enable(){
 void system_Init()
 {
 	dbus_uart_init();  //初始化dbus
-	GUN_MOTOR_Init();	
+	Gun_Motor_Init();	 //摩擦轮初始化
 	//can1
 	my_can_filter_init_recv_all(&hcan1);
 	__HAL_CAN_ENABLE_IT(&hcan1, CAN_IT_RX_FIFO0_MSG_PENDING);  
 	//pid参数初始化
 	PID_Param_Init();
-	
 }
 
  //限幅

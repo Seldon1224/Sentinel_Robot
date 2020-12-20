@@ -70,6 +70,10 @@ extern extVisionSendData_t VisionSendData; //视觉发送结构体
 
 extern uint8_t ReadTemp[20];
 
+extern uint8_t Vision_Get_New_Data;
+
+uint8_t Vision_If_Update(void);
+void Clear_Vision_Get_Flag(void);
 void Vision_Read_Data(uint8_t *ReadFormUsart);
 void Vision_Send_Data(uint8_t CmdID);
 
