@@ -121,9 +121,9 @@ int main(void)
   system_Init();
   //HAL_UART_Receive_IT(&huart3,(uint8_t *)USART3_temp,VISION_LENGTH);
   HAL_UART_Receive_IT(&huart8, originData, 5);
-  HAL_UART_Receive_IT(&huart6, (uint8_t *)UART6_temp, VISION_LENGTH);          //视觉
+  HAL_UART_Receive_IT(&huart6, (uint8_t *)UART6_temp, VISION_LENGTH);          //视觉串口
   
-  HAL_UART_Receive_IT(&huart7, &ano_data_rec, 1);                      //串口7-匿名上位�?
+  HAL_UART_Receive_IT(&huart7, &ano_data_rec, 1);                      //串口7-匿名上位机
   /* USER CODE END 2 */
 
   /* Init scheduler */

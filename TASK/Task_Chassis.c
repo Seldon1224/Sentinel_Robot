@@ -17,11 +17,11 @@ void Task_Chassis(void* argument)
         //获取底盘电机期望速度
 				GET_Chassis_Dir_Spd();
 				pid_calc(&pid_chassis, moto_chassis.speed_rpm, set_chassis);				
-//        set_moto_current_all(&hcan1, 2,
-//            pid_spd[0].delta_out,  //1
-//            pid_spd[1].delta_out,  //2
-//            pid_spd[2].delta_out,  //3
-//            pid_spd[3].delta_out); //4
+        set_moto_current_all(&hcan1, 2,
+            pid_chassis.delta_out,  //1
+            0,  //2
+            0,  //3
+            0); //4
         osDelay(3);
     }
 }
@@ -33,7 +33,7 @@ void GET_Chassis_Dir_Spd()
     switch (roboStatus.control_mode)
     {
     case Remote_mode:
-        set_chassis=rc.CONTROLLER.ch1;
+        set_chassis=2000 * rc.CONTROLLER.ch3/660.0f;
         break;
     case AutoAim_mode:
        set_chassis=0;

@@ -38,25 +38,7 @@ void Task_Gimbal(void *argument)
 	Gimbal_PID_struct_init();
 	for (;;)
 	{
-//		if(revFlag)
-//		{
-//			GET_Gimbal_Dir_xyw(); //获取云台电机期望角度
-//			revFlag = 0;
-//		}
-//		else
-//		{
-//			//only get cur_moto angle when revFlag is disable
-//			// notice vision angle has been reducedt to aviod over adjustment. i will note out where i've moticfied.
-//			cur_yaw[GIMBAL_Above] = FORMAT_Angle(moto_yaw[GIMBAL_Above].total_angle);
-//			cur_pit[GIMBAL_Above] = FORMAT_Angle(moto_pit[GIMBAL_Above].total_angle);
-//			cur_yaw[GIMBAL_Below] = FORMAT_Angle(moto_yaw[GIMBAL_Below].total_angle);
-//			cur_pit[GIMBAL_Below] = FORMAT_Angle(moto_pit[GIMBAL_Below].total_angle);
-//		}
-//		if(set_yaw[GIMBAL_Below] - cur_yaw[GIMBAL_Below]<valueStart)
-//		{
-//			//revFlag = 1;
-//			
-//		}
+
 		GET_Gimbal_Dir_xyw(); //获取云台电机期望角度
 		Gimbal_PID_calculate();
 		Gimbal_Send_Current(); //向云台发送电流值
@@ -68,9 +50,8 @@ void Gimbal_Send_Current()
 {
 	set_moto_current_all(&hcan1, 0,						 //0x1ff
 						 0,								 //1
-						 0,								 //2
-						 //pid_yaw_spd.pos_out,			 //3 ---下yaw
-						 pid_yaw[GIMBAL_Below].pos_out,
+						 0,								 //2		 
+						 pid_yaw[GIMBAL_Below].pos_out, //3 ---下yaw
 						 pid_pit[GIMBAL_Below].pos_out); //4 ---下pit
 //	set_moto_current_all(&hcan1, 1, //0x2ff
 //						 pid_yaw[GIMBAL_Above].pos_out,          //5 ---上yaw
@@ -103,9 +84,7 @@ void GET_Gimbal_Dir_xyw(void)
 	case AutoAim_mode:
 		//自瞄
 		//视觉测试（下云台）
-		if (VisionRecvData.identify_target 
-				&& Angle_In_Range(VisionRecvData.pitch_angle, -40, 40) 
-				&& Angle_In_Range(VisionRecvData.yaw_angle, -40, 40))
+		if (VisionRecvData.identify_target)
 		{
 			// i've changed here.   visionK
 			
