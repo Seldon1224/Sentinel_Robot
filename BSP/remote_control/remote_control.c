@@ -49,11 +49,11 @@ void rc_callback_handler(RC_REV *rc, uint8_t *buff)
             memset(rc, 0, sizeof(RC_REV));
         }
         //消除摇杆漂移
-        if ((abs(rc->CONTROLLER.ch1) < 5))
+        if ((abs(rc->CONTROLLER.ch1) < 10))
         {
             rc->CONTROLLER.ch1 = 0;
         }
-				if((abs(rc->CONTROLLER.ch2) < 5)){
+				if((abs(rc->CONTROLLER.ch2) < 10)){
 				    rc->CONTROLLER.ch2 = 0;
 				}
         //鼠标赋值

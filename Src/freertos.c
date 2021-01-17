@@ -225,12 +225,12 @@ void StartSendData(void *argument)
 //					-set_spd[3],0);
 				 ANO_DT_Display(
 					cur_yaw[GIMBAL_Above]*100,
-					cur_pit[GIMBAL_Above]*100, 
+					cur_pit[GIMBAL_Below]*100, 
 				  set_yaw[GIMBAL_Above]*100,
-					set_pit[GIMBAL_Above]*100,
+					set_pit[GIMBAL_Below]*100,
 					cur_yaw[GIMBAL_Below]*100, //5
 					(cur_yaw[GIMBAL_Below]+VisionRecvData.yaw_angle)*100,
-					cur_pit[GIMBAL_Below]*100, 
+					set_yaw[GIMBAL_Below]*100, 
 					(cur_pit[GIMBAL_Below]+VisionRecvData.pitch_angle)*100,
 					0);
 		//ANO_DT_Send_Udata(moto_chassis[3].angle,moto_chassis[3].speed_rpm,4,5,6,7,8,9,0);

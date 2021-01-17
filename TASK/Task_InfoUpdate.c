@@ -10,12 +10,9 @@ void Task_InfoUpdate(void *argument)
 	for (;;)
 	{
 		Debug();			   //debug串口
-		imu_update(&mpu_data); //陀螺仪
-
 		//2020.11.11新增，从can_receive修改到此
 		keyboard_scan();
 		GET_Control_Mode();
-
 		osDelay(3);
 	}
 }

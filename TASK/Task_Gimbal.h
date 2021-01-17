@@ -10,8 +10,15 @@
 #include "cmsis_os.h"
 #include "param.h"
 #include "user_lib.h"
+#include "GUN_MOTOR.h"
 #define GIMBAL_Above 0
 #define GIMBAL_Below 1
+
+#define MAX_BELOW_YAW_ANGLE 70
+#define MAX_BELOW_PIT_ANGLE 40
+#define MIN_BELOW_PIT_ANGLE -70
+
+#define AUTO_RATE_VALUE (0.2f)
 
 #define FORMAT_Angle(a) (a * 360.0f / 8192)
 #define YAW_BELOW_MID_POS 2700
@@ -55,7 +62,7 @@ extern float set_pit[2];
 extern float cur_yaw[2];
 extern float cur_pit[2];
 
-extern IMU_UART mpu_data;
+
 
 void Task_Gimbal(void *argument);
 #endif
