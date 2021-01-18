@@ -26,9 +26,9 @@ typedef __packed struct
 
 	/* 数据 */
 	float yaw_angle;		 //例：100.1 33 33 C8 42
-	float pitch_angle;		 //注意：stm32 float为小端
-	float distance;			 //距离
-	uint8_t shoot_lock;		 //是否瞄准到了中间  0没有  1瞄准到了
+	float pitch_angle;		     //注意：stm32 float为小端
+	float distance;			 		  //距离
+	uint8_t shoot_cmd;		   //是否开始射击  0  1-开始
 	uint8_t identify_target; //视野内是否有目标/是否识别到了目标   0否  1是
 	uint8_t blank_a;
 

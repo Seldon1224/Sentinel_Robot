@@ -19,7 +19,12 @@ float cur_pit[2];
 float visionK = 0.3;
 
 //yaw轴电机巡逻系数
-float auto_rate = AUTO_RATE_VALUE;
+float auto_rate_yaw = AUTO_RATE_VALUE;
+float auto_rate_pit = AUTO_RATE_VALUE;
+
+//自瞄角度调整
+float adjust_angle_pit = 0;
+float adjust_angle_yaw = 0;
 
 void Task_Gimbal(void *argument)
 {
@@ -36,9 +41,10 @@ void Task_Gimbal(void *argument)
 
 void Gimbal_Send_Current()
 {
+
 	set_moto_current_all(&hcan1, 0,						 //0x1ff
 						 0,								 //1
-						 0,								 //2
+						 pid_pit[GIMBAL_Above].pos_out,	 //2
 						 pid_yaw[GIMBAL_Below].pos_out,	 //3 ---下yaw
 						 pid_pit[GIMBAL_Below].pos_out); //4 ---下pit
 	set_moto_current_all(&hcan1, 1,						 //0x2ff
@@ -55,6 +61,8 @@ void GET_Gimbal_Dir_xyw(void)
 	cur_pit[GIMBAL_Above] = FORMAT_Angle(moto_pit[GIMBAL_Above].total_angle);
 	cur_yaw[GIMBAL_Below] = FORMAT_Angle(moto_yaw[GIMBAL_Below].total_angle);
 	cur_pit[GIMBAL_Below] = FORMAT_Angle(moto_pit[GIMBAL_Below].total_angle);
+
+	set_pit[GIMBAL_Above] = -150;
 	switch (roboStatus.control_mode)
 	{
 	case Remote_mode:
@@ -81,25 +89,33 @@ void GET_Gimbal_Dir_xyw(void)
 		//视觉测试（下云台）
 		if (VisionRecvData.identify_target)
 		{
+			max_count = MAX_COUNT_MOVE - 40;
 			if (Vision_If_Update() == true)
 			{
-				set_pit[GIMBAL_Below] = VisionRecvData.pitch_angle * visionK + cur_pit[GIMBAL_Below];
-				set_yaw[GIMBAL_Below] = VisionRecvData.yaw_angle * visionK + cur_yaw[GIMBAL_Below];
+				set_pit[GIMBAL_Below] = VisionRecvData.pitch_angle * visionK + cur_pit[GIMBAL_Below] + adjust_angle_pit;
+				set_yaw[GIMBAL_Below] = VisionRecvData.yaw_angle * visionK + cur_yaw[GIMBAL_Below] + adjust_angle_yaw;
 				//清楚视觉识别Flag
 				Clear_Vision_Get_Flag();
 			}
-			//设定角度限幅
-			set_pit[GIMBAL_Below] = fp32_constrain(set_pit[GIMBAL_Below], MIN_BELOW_PIT_ANGLE, MAX_BELOW_PIT_ANGLE);
-			set_yaw[GIMBAL_Below] = fp32_constrain(set_yaw[GIMBAL_Below], -MAX_BELOW_YAW_ANGLE, MAX_BELOW_YAW_ANGLE);
+			if(VisionRecvData.shoot_cmd)
+			{
+				Gun_Motor_SHOOT();
+			}
+			else 
+			{
+				Gun_Motor_Stop();
+			}
 		}
 		else
 		{
-			//		set_yaw[GIMBAL_Below] = 0;
-			//		a
+			max_count = MAX_COUNT_MOVE;
+			set_yaw[GIMBAL_Below] += auto_rate_yaw * 0.5f;
+			set_pit[GIMBAL_Below] += auto_rate_pit * 4.0f;
+			changeAutoRate();
 		}
 		break;
 	case Disable_mode:
-		set_pit[GIMBAL_Above] = 0;
+		set_pit[GIMBAL_Above] = -150;
 		set_yaw[GIMBAL_Above] = 0;
 		set_pit[GIMBAL_Below] = 0;
 		set_yaw[GIMBAL_Below] = 0;
@@ -107,6 +123,10 @@ void GET_Gimbal_Dir_xyw(void)
 		set_revolve_spd[GIMBAL_Below] = 0;
 		break;
 	}
+
+	//设定角度限幅
+	set_pit[GIMBAL_Below] = fp32_constrain(set_pit[GIMBAL_Below], MIN_BELOW_PIT_ANGLE, MAX_BELOW_PIT_ANGLE);
+	set_yaw[GIMBAL_Below] = fp32_constrain(set_yaw[GIMBAL_Below], -MAX_BELOW_YAW_ANGLE, MAX_BELOW_YAW_ANGLE);
 }
 
 void Gimbal_PID_calculate()
@@ -146,6 +166,15 @@ void Gimbal_PID_struct_init(void)
 					POSITION_PID, 20000, 1000, 20, 0, 0); //yaw电机
 }
 
-void Gimbal_PID_rest()
+void changeAutoRate()
 {
+	if (set_yaw[GIMBAL_Below] >= MAX_BELOW_YAW_ANGLE)
+		auto_rate_yaw = -auto_rate_yaw;
+	else if (set_yaw[GIMBAL_Below] <= -MAX_BELOW_YAW_ANGLE)
+		auto_rate_yaw = -auto_rate_yaw;
+
+	if (set_pit[GIMBAL_Below] >= MAX_BELOW_PIT_ANGLE)
+		auto_rate_pit = -auto_rate_pit;
+	else if (set_pit[GIMBAL_Below] <= -MAX_BELOW_PIT_ANGLE)
+		auto_rate_pit = -auto_rate_pit;
 }

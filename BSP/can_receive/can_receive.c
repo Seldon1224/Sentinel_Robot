@@ -151,7 +151,7 @@ void HAL_CAN_RxFifo0MsgPendingCallback(CAN_HandleTypeDef *hcan)
 			moto_chassis = moto_base[0];			   //底盘
 			moto_pit[GIMBAL_Below] = moto_base[7];	   //云台竖
 			moto_yaw[GIMBAL_Below] = moto_base[6];	   //云台横xd
-			moto_pit[GIMBAL_Above] = moto_base[9];	   //云台竖xd
+			moto_pit[GIMBAL_Above] = moto_base[5];	   //云台竖xd  //暂时改 之前为9
 			moto_yaw[GIMBAL_Above] = moto_base[8];	   //云台横xd
 			moto_revolve[GIMBAL_Below] = moto_base[1]; //下拨盘xd
 			moto_revolve[GIMBAL_Above] = moto_base[6]; //上拨盘

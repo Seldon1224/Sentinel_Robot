@@ -11,10 +11,11 @@
 #include "param.h"
 #include "user_lib.h"
 #include "GUN_MOTOR.h"
+#include "Task_Chassis.h"
 #define GIMBAL_Above 0
 #define GIMBAL_Below 1
 
-#define MAX_BELOW_YAW_ANGLE 70
+#define MAX_BELOW_YAW_ANGLE 50 //70max
 #define MAX_BELOW_PIT_ANGLE 40
 #define MIN_BELOW_PIT_ANGLE -70
 
@@ -63,6 +64,6 @@ extern float cur_yaw[2];
 extern float cur_pit[2];
 
 
-
+void changeAutoRate(void);
 void Task_Gimbal(void *argument);
 #endif
