@@ -83,9 +83,9 @@ void PID_struct_init(
 float pid_calc(pid_t* pid, float fdb, float ref);
 void PID_rest(pid_t* pid);    
 
-		
 
-extern pid_t pid_yaw_spd;
+extern pid_t pid_pit_spd[2];
+extern pid_t pid_yaw_spd[2];
 extern pid_t pid_pit[2];
 extern pid_t pid_yaw[2];
 extern pid_t pid_chassis;

@@ -41,7 +41,8 @@
 
 pid_t pid_pit[2];
 pid_t pid_yaw[2];
-pid_t pid_yaw_spd;
+pid_t pid_pit_spd[2];
+pid_t pid_yaw_spd[2];
 pid_t pid_revolve[2]; //上下拨盘
 pid_t pid_chassis; //滑轨移动
 

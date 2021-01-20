@@ -32,7 +32,7 @@ void Task_Chassis(void *argument)
     pid_calc(&pid_chassis, moto_chassis.speed_rpm, set_chassis);
     set_moto_current_all(&hcan1, 2,
                          pid_chassis.pos_out,               //1
-                         pid_revolve[GIMBAL_Below].pos_out, //2  下拨盘
+                         pid_revolve[GIMBAL_Below].delta_out, //2  下拨盘
                          0,                                 //3
                          0);                                //4
     osDelay(3);
