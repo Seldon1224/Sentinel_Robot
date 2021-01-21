@@ -226,8 +226,8 @@ void StartSendData(void *argument)
 				 ANO_DT_Display(
 					cur_yaw[GIMBAL_Above]*100,
 					cur_pit[GIMBAL_Below]*100, 
-				  set_yaw[GIMBAL_Above]*100,
-					set_pit[GIMBAL_Below]*100,
+				  VisionRecvData.pitch_angle*100,
+					VisionRecvData.yaw_angle*100,
 					cur_yaw[GIMBAL_Below]*100, //5
 					(cur_yaw[GIMBAL_Below]+VisionRecvData.yaw_angle)*100,
 					set_yaw[GIMBAL_Below]*100, 

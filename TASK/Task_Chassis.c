@@ -48,24 +48,25 @@ void GET_Chassis_Dir_Spd()
 		flag_auto_aim = 0;
     break;
   case AutoAim_mode:
-		if(flag_auto_aim == 0)
-		{
-			flag_auto_aim = 1;
-			set_chassis = 2000;
-			count_offset = moto_chassis.round_cnt;
-		}
-		current_count = moto_chassis.round_cnt - count_offset;
+//		if(flag_auto_aim == 0)
+//		{
+//			flag_auto_aim = 1;
+//			set_chassis = 2000;
+//			count_offset = moto_chassis.round_cnt;
+//		}
+//		current_count = moto_chassis.round_cnt - count_offset;
 
-		//达到最大圈数切换方向
-		if(abs(current_count) >= max_count)
-		{
-				if(set_chassis == 2000)
-					set_chassis = -2000;
-				else if(set_chassis == -2000)
-					set_chassis = 2000;
-				count_offset = moto_chassis.round_cnt;
-				current_count = moto_chassis.round_cnt - count_offset;
-		}			
+//		//达到最大圈数切换方向
+//		if(abs(current_count) >= max_count)
+//		{
+//				if(set_chassis == 2000)
+//					set_chassis = -2000;
+//				else if(set_chassis == -2000)
+//					set_chassis = 2000;
+//				count_offset = moto_chassis.round_cnt;
+//				current_count = moto_chassis.round_cnt - count_offset;
+	set_chassis = 2000 * rc.CONTROLLER.ch3 / 660.0f;
+//		}			
     break;
   case Disable_mode:
     set_chassis = 0;

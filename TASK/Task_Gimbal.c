@@ -93,7 +93,7 @@ void GET_Gimbal_Dir_xyw(void)
 		//视觉测试（下云台）
 		if (VisionRecvData.identify_target)
 		{
-			max_count = 30;
+			max_count = 0;
 			if (Vision_If_Update() == true)
 			{
 				set_pit[GIMBAL_Below] = VisionRecvData.pitch_angle * visionK + cur_pit[GIMBAL_Below] + adjust_angle_pit;
@@ -112,9 +112,9 @@ void GET_Gimbal_Dir_xyw(void)
 		}
 		else
 		{
-			max_count = MAX_COUNT_MOVE;
-			set_yaw[GIMBAL_Below] += auto_rate_yaw * 0.5f;
-			set_pit[GIMBAL_Below] += auto_rate_pit * 3.0f;  //4.0f
+//			max_count = MAX_COUNT_MOVE;
+//			set_yaw[GIMBAL_Below] += auto_rate_yaw * 0.5f;
+//			set_pit[GIMBAL_Below] += auto_rate_pit * 0.0f;  //4.0f
 			changeAutoRate();
 		}
 		break;
