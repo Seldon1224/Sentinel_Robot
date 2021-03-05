@@ -70,7 +70,8 @@ void MX_FREERTOS_Init(void);
 /* USER CODE BEGIN 0 */
 uint8_t originData[5] = {0}; //Debug串口接收到的原始数据
 uint8_t DebugRevFlag;
-
+//裁判系统
+uint8_t JudgeTemp[50];
 uint8_t USART3_temp[VISION_LENGTH];
 uint8_t UART6_temp[VISION_LENGTH];
 /* USER CODE END 0 */
@@ -123,6 +124,8 @@ int main(void)
 
   HAL_UART_Receive_IT(&huart6, (uint8_t *)UART6_temp, VISION_LENGTH); //视觉串口
   HAL_UART_Receive_IT(&huart7, &ano_data_rec, 1);                     //串口7-匿名上位机接收数据
+	
+	HAL_UART_Receive_IT(&huart8, JudgeTemp, 50); 
   /* USER CODE END 2 */
 
   /* Init scheduler */
@@ -207,8 +210,7 @@ void HAL_UART_RxCpltCallback(UART_HandleTypeDef *huart)
   }
   if (huart->Instance == UART8)
   {
-    DebugRevFlag += 1;
-    //        HAL_UART_Receive_IT(&huart6, ReadTemp, VISION_LENGTH);
+    HAL_UART_Receive_IT(&huart8, JudgeTemp, 50); 
   }
 }
 int fputc(int ch, FILE *f)

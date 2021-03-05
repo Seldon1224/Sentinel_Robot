@@ -1,5 +1,5 @@
 #include "Task_Gimbal.h"
-
+#include "can.h"
 void GET_Gimbal_Dir_xyw(void);
 void Gimbal_PID_struct_init(void);
 void Gimbal_PID_calculate(void);
@@ -81,10 +81,9 @@ void GET_Gimbal_Dir_xyw(void)
 		}
 		else if (rc.CONTROLLER.sw2 == RC_SW_DOWN)
 		{
-//			Gun_Motor_SHOOT();
+			Gun_Motor_SHOOT();
 			set_pit[GIMBAL_Below] = rc.CONTROLLER.ch2 * 30.0f / 660; //PITCH轴为绝对位置
 			set_yaw[GIMBAL_Below] = rc.CONTROLLER.ch1 * 30.0f / 660;
-			
 			set_revolve_spd[GIMBAL_Below] = rc.CONTROLLER.ch4 * 1500.0f / 660;
 		}
 		break;

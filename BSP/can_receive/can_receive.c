@@ -83,69 +83,24 @@ void HAL_CAN_RxFifo0MsgPendingCallback(CAN_HandleTypeDef *hcan)
 		{
 			switch (RxHeader.StdId)
 			{
-			case CAN_3508Moto1_ID: //0
-			case CAN_3508Moto2_ID: //1
-			case CAN_3508Moto3_ID: //2
-			case CAN_3508Moto4_ID: //3
-			case CAN_6020Moto1_ID: //4
-			case CAN_6020Moto2_ID: //5
-			case CAN_6020Moto3_ID: //6
-			case CAN_6020Moto4_ID: //7
-			case CAN_6020Moto5_ID: //8
-			case CAN_6020Moto6_ID: //9
-			case CAN_6020Moto7_ID: //10
-			{
-				static u8 i;
-				i = RxHeader.StdId - CAN_3508Moto1_ID;
-				moto_base[i].msg_cnt++ <= 1 ? set_moto_offset() : get_moto_measure(&moto_base[i], Data);
-				get_moto_measure(&moto_info, Data);
-			}
-			break;
-			case ID_supply_projectile_action_t:
-			{
-				get_supply_projectile_action(&SupplyProjectileAction, Data);
-			}
-			break;
-			case ID_game_robot_state_one_t:
-			{
-				get_game_robot_state_one(&GameRobotStat, Data);
-			}
-			break;
-			case ID_game_robot_state_two_t:
-			{
-				get_game_robot_state_two(&GameRobotStat, Data);
-			}
-			break;
-			case ID_game_robot_state_three_t:
-			{
-				get_game_robot_state_three(&GameRobotStat, Data);
-			}
-			break;
-			case ID_power_heat_data_one_t:
-			{
-				get_power_heat_data_one(&PowerHeatData, Data);
-			}
-			break;
-			case ID_power_heat_data_two_t:
-			{
-				get_power_heat_data_two(&PowerHeatData, Data);
-			}
-			break;
-			case ID_robot_hurt_t:
-			{
-				get_robot_hurt(&RobotHurt, Data);
-			}
-			break;
-			case ID_shoot_data_t:
-			{
-				get_shoot_data(&ShootData, Data);
-			}
-			break;
-			case ID_rfid_status_t:
-			{
-				get_rfid_status(&RFIDState, Data);
-			}
-			break;
+				case CAN_3508Moto1_ID: //0
+				case CAN_3508Moto2_ID: //1
+				case CAN_3508Moto3_ID: //2
+				case CAN_3508Moto4_ID: //3
+				case CAN_6020Moto1_ID: //4
+				case CAN_6020Moto2_ID: //5
+				case CAN_6020Moto3_ID: //6
+				case CAN_6020Moto4_ID: //7
+				case CAN_6020Moto5_ID: //8
+				case CAN_6020Moto6_ID: //9
+				case CAN_6020Moto7_ID: //10
+				{
+					static u8 i;
+					i = RxHeader.StdId - CAN_3508Moto1_ID;
+					moto_base[i].msg_cnt++ <= 1 ? set_moto_offset() : get_moto_measure(&moto_base[i], Data);
+					get_moto_measure(&moto_info, Data);
+				}
+				break;
 			}
 			//电机对应关系
 			moto_chassis = moto_base[0];			   //底盘
