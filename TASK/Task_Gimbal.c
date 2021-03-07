@@ -42,19 +42,19 @@ void Task_Gimbal(void *argument)
 void Gimbal_Send_Current()
 {
 
-	set_moto_current_all(&hcan1, 0,						 //0x1ff
-						 0,								 //1
-						 pid_pit[GIMBAL_Above].pos_out,	 //2
-						 pid_yaw_spd[GIMBAL_Below].delta_out,	 //3 ---下yaw
-//						 pid_yaw[GIMBAL_Below].pos_out,
-//						 pid_pit[GIMBAL_Below].pos_out); //4 ---下pit
+	set_moto_current_all(&hcan1, 0,							   //0x1ff
+						 0,									   //1
+						 pid_pit[GIMBAL_Above].pos_out,		   //2
+						 pid_yaw_spd[GIMBAL_Below].delta_out,  //3 ---下yaw
+															   //pid_yaw[GIMBAL_Below].pos_out,
+															   //pid_pit[GIMBAL_Below].pos_out); //4 ---下pit
 						 pid_pit_spd[GIMBAL_Below].delta_out); //4 ---下pit
 
-	set_moto_current_all(&hcan1, 1,						 //0x2ff
-						 0,								 //5 ---上yaw
-						 0,								 //6 ---上pit
-						 0,								 //7
-						 0);							 //8
+	set_moto_current_all(&hcan1, 1, //0x2ff
+						 0,			//5 ---上yaw
+						 0,			//6 ---上pit
+						 0,			//7
+						 0);		//8
 }
 
 void GET_Gimbal_Dir_xyw(void)
@@ -71,9 +71,9 @@ void GET_Gimbal_Dir_xyw(void)
 		set_revolve_spd[GIMBAL_Below] = 500;
 		if (rc.CONTROLLER.sw2 == RC_SW_UP)
 		{
-//			set_pit[GIMBAL_Above] = -rc.CONTROLLER.ch2 * 30.0f / 660; //PITCH轴为绝对位置
-//			set_yaw[GIMBAL_Above] = rc.CONTROLLER.ch1 * 60.0f / 660;
-//			Gun_Motor_SHOOT();
+			//			set_pit[GIMBAL_Above] = -rc.CONTROLLER.ch2 * 30.0f / 660; //PITCH轴为绝对位置
+			//			set_yaw[GIMBAL_Above] = rc.CONTROLLER.ch1 * 60.0f / 660;
+			//			Gun_Motor_SHOOT();
 		}
 		else if (rc.CONTROLLER.sw2 == RC_SW_MID)
 		{
@@ -93,27 +93,27 @@ void GET_Gimbal_Dir_xyw(void)
 		if (VisionRecvData.identify_target)
 		{
 			max_count = 0;
-			if (Vision_If_Update() == true)
+			if (Vision_If_Update())
 			{
 				set_pit[GIMBAL_Below] = VisionRecvData.pitch_angle * visionK + cur_pit[GIMBAL_Below] + adjust_angle_pit;
 				set_yaw[GIMBAL_Below] = VisionRecvData.yaw_angle * visionK + cur_yaw[GIMBAL_Below] + adjust_angle_yaw;
 				//清楚视觉识别Flag
 				Clear_Vision_Get_Flag();
 			}
-			if(VisionRecvData.shoot_cmd)
+			if (VisionRecvData.shoot_cmd)
 			{
-//				Gun_Motor_SHOOT();
+				//				Gun_Motor_SHOOT();
 			}
-			else 
+			else
 			{
 				Gun_Motor_Stop();
 			}
 		}
 		else
 		{
-//			max_count = MAX_COUNT_MOVE;
-//			set_yaw[GIMBAL_Below] += auto_rate_yaw * 0.5f;
-//			set_pit[GIMBAL_Below] += auto_rate_pit * 0.0f;  //4.0f
+			//			max_count = MAX_COUNT_MOVE;
+			//			set_yaw[GIMBAL_Below] += auto_rate_yaw * 0.5f;
+			//			set_pit[GIMBAL_Below] += auto_rate_pit * 0.0f;  //4.0f
 			changeAutoRate();
 		}
 		break;
@@ -139,11 +139,11 @@ void Gimbal_PID_calculate()
 	pid_calc(&pid_pit[1], cur_pit[1], set_pit[1]);
 
 	//串级pid 下pit
-	pid_calc(&pid_pit[GIMBAL_Below], cur_pit[GIMBAL_Below], set_pit[GIMBAL_Below]);											 //角度环
+	pid_calc(&pid_pit[GIMBAL_Below], cur_pit[GIMBAL_Below], set_pit[GIMBAL_Below]);						   //角度环
 	pid_calc(&pid_pit_spd[GIMBAL_Below], moto_pit[GIMBAL_Below].speed_rpm, pid_pit[GIMBAL_Below].pos_out); //速度环
-	
+
 	//串级pid 下yaw
-	pid_calc(&pid_yaw[GIMBAL_Below], cur_yaw[GIMBAL_Below], set_yaw[GIMBAL_Below]);											 //角度环
+	pid_calc(&pid_yaw[GIMBAL_Below], cur_yaw[GIMBAL_Below], set_yaw[GIMBAL_Below]);						   //角度环
 	pid_calc(&pid_yaw_spd[GIMBAL_Below], moto_yaw[GIMBAL_Below].speed_rpm, pid_yaw[GIMBAL_Below].pos_out); //速度环
 
 	//下拨盘
