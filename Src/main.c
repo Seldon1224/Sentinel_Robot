@@ -37,6 +37,7 @@
 #include "Task_Gimbal.h"
 #include "Visual_Scope.h"
 #include "./ANO_DT/ANO_DT.h"
+#include "./judge/judge.h"
 /* USER CODE END Includes */
 
 /* Private typedef -----------------------------------------------------------*/
