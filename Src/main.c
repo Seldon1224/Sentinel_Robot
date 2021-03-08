@@ -37,6 +37,7 @@
 #include "Task_Gimbal.h"
 #include "Visual_Scope.h"
 #include "./ANO_DT/ANO_DT.h"
+#include "./judge/judge.h"
 /* USER CODE END Includes */
 
 /* Private typedef -----------------------------------------------------------*/
@@ -72,8 +73,7 @@ uint8_t originData[5] = {0}; //Debug串口接收到的原始数据
 uint8_t DebugRevFlag;
 //裁判系统
 uint8_t JudgeTemp[50];
-uint8_t USART3_temp[VISION_LENGTH];
-uint8_t UART6_temp[VISION_LENGTH];
+uint8_t UART6_temp[VISION_RX_LENGTH];
 /* USER CODE END 0 */
 
 /**

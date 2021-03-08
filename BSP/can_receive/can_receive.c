@@ -1,5 +1,6 @@
 #include "can_receive.h"
 #include "Task_Gimbal.h"
+#include "./judge/judge.h"
 moto_measure_t moto_base[DJnumber]; //电机总数
 moto_measure_t moto_chassis;		//chassis moto
 moto_measure_t moto_pit[2];
