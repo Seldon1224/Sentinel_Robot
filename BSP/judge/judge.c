@@ -3,10 +3,10 @@
 
 /*****************系统数据定义**********************/
 ext_game_state_t       				        GameState;					      //0x0001
-ext_game_result_t            		      GameResult;				    	  //0x0002
-ext_game_robot_HP_t                   RoboHP;                   //0x0003
+ext_game_result_t            		      GameResult;				    	  //0x0002              
+ext_game_robot_HP_t                   RoboHP;                   //0x0003 机器人血量   *****
 ext_dart_status_t                     DartState;                //0x0004
-//ext_ICRA_buff_debuff_zone_status_t                            //0x0005智能赛      xxxxxx
+//ext_ICRA_buff_debuff_zone_status_t                            //0x0005 智能赛       xxxxx
 ext_event_data_t        			        EventData;				      	//0x0101
 ext_supply_projectile_action_t		    SupplyProjectileAction;	  //0x0102 补给站       *****
 ext_referee_warning_t 	              RefWarning;               //0x0104
@@ -14,11 +14,11 @@ ext_dart_remaining_time_t             DartTime;                 //0x0105
 ext_game_robot_state_t			  	      GameRobotStat;				    //0x0201 机器人状态   *****
 ext_power_heat_data_t		  		        PowerHeatData;				    //0x0202 功率热量     *****
 ext_game_robot_pos_t			            GameRobotPos;				      //0x0203
-ext_buff_musk_t					              BuffMusk;				      	  //0x0204
+ext_buff_musk_t					              BuffMusk;				      	  //0x0204 增益数据     *****
 aerial_robot_energy_t				          AerialRobotEnergy;	  		//0x0205
 ext_robot_hurt_t				              RobotHurt;					      //0x0206 伤害类型     *****
 ext_shoot_data_t					            ShootData;					      //0x0207 射击信息     *****
-ext_bullet_remaining_t                ReBullet;                 //0x0208      
+ext_bullet_remaining_t                ReBullet;                 //0x0208 剩余子弹数量 *****    
 ext_rfid_status_t                     RFIDState;                //0x0209 RFID状态     *****
 ext_dart_client_cmd_t                 DartClient;               //0x020A
 
@@ -90,9 +90,13 @@ bool Judge_Read_Data(uint8_t *ReadFromUsart)
 					case ID_game_result:          		//0x0002
 						memcpy(&GameResult, (ReadFromUsart + DATA), LEN_game_result);
 					break;
-					
 					case ID_game_robot_HP:       //0x0003
 						memcpy(&RoboHP, (ReadFromUsart + DATA), LEN_game_robot_HP_t );
+						set_robo_hp_one(&hcan1, ID_game_robot_HP_one_tx, RoboHP.red_1_robot_HP, RoboHP.red_2_robot_HP, RoboHP.red_3_robot_HP, RoboHP.red_4_robot_HP);
+						set_robo_hp_two(&hcan1, ID_game_robot_HP_two_tx, RoboHP.red_5_robot_HP, RoboHP.red_7_robot_HP, RoboHP.red_outpost_HP, RoboHP.red_base_HP);
+						set_robo_hp_three(&hcan1, ID_game_robot_HP_three_tx, RoboHP.blue_1_robot_HP, RoboHP.blue_2_robot_HP, RoboHP.blue_3_robot_HP, RoboHP.blue_4_robot_HP);
+						set_robo_hp_four(&hcan1, ID_game_robot_HP_four_tx, RoboHP.blue_5_robot_HP, RoboHP. blue_7_robot_HP, RoboHP.blue_outpost_HP);
+					
 					break;
 					
 					case ID_dart_status:       //0x0004
@@ -106,7 +110,7 @@ bool Judge_Read_Data(uint8_t *ReadFromUsart)
 					
 					case ID_supply_projectile_action:   //0x0102
 						memcpy(&SupplyProjectileAction, (ReadFromUsart + DATA), LEN_supply_projectile_action_t );
-				    set_supply_projectile_action(&hcan1,0x1102, SupplyProjectileAction.supply_projectile_id,SupplyProjectileAction.supply_robot_id,SupplyProjectileAction.supply_projectile_step,SupplyProjectileAction.supply_projectile_num);
+				    set_supply_projectile_action(&hcan1,ID_supply_projectile_action_tx, SupplyProjectileAction.supply_projectile_id,SupplyProjectileAction.supply_robot_id,SupplyProjectileAction.supply_projectile_step,SupplyProjectileAction.supply_projectile_num);
 					break;
 					
 					case ID_referee_warning:        //0x0104
@@ -115,16 +119,16 @@ bool Judge_Read_Data(uint8_t *ReadFromUsart)
 					
 					case ID_game_robot_state:      		//0x0201
 						memcpy(&GameRobotStat, (ReadFromUsart + DATA), LEN_game_robot_state);
-					  set_game_robot_state_one(&hcan1, ID_game_robot_state_one_tx,  GameRobotStat.robot_id, GameRobotStat.robot_level, GameRobotStat.remain_HP, GameRobotStat.max_HP, GameRobotStat.shooter_heat0_cooling_rate);
-				  	set_game_robot_state_two(&hcan1, ID_game_robot_state_two_tx,  GameRobotStat.shooter_heat0_cooling_limit, GameRobotStat.shooter_heat1_cooling_rate, GameRobotStat.shooter_heat1_cooling_limit, GameRobotStat.shooter_heat0_speed_limit,GameRobotStat.shooter_heat1_speed_limit);
-				  	set_game_robot_state_three(&hcan1, ID_game_robot_state_three_tx,  GameRobotStat.max_chassis_power, GameRobotStat.mains_power_gimbal_output, GameRobotStat.mains_power_chassis_output, GameRobotStat.mains_power_shooter_output);
-					
+					  set_game_robot_state_one(&hcan1, ID_game_robot_state_one_tx,  GameRobotStat.robot_id, GameRobotStat.robot_level, GameRobotStat.remain_HP, GameRobotStat.max_HP, GameRobotStat.shooter_id1_17mm_cooling_rate);
+				  	set_game_robot_state_two(&hcan1, ID_game_robot_state_two_tx,  GameRobotStat.shooter_id1_17mm_cooling_limit, GameRobotStat.shooter_id1_17mm_speed_limit, GameRobotStat.shooter_id2_17mm_cooling_rate, GameRobotStat.shooter_id2_17mm_cooling_limit);
+				  	set_game_robot_state_three(&hcan1, ID_game_robot_state_three_tx,  GameRobotStat.shooter_id2_17mm_speed_limit, GameRobotStat.shooter_id1_42mm_cooling_rate, GameRobotStat.shooter_id1_42mm_cooling_limit, GameRobotStat.shooter_id1_42mm_speed_limit);
+				  	set_game_robot_state_four(&hcan1, ID_game_robot_state_four_tx,  GameRobotStat.chassis_power_limit, GameRobotStat.mains_power_gimbal_output, GameRobotStat.mains_power_chassis_output, GameRobotStat.mains_power_shooter_output);
 					break;
 					
 					case ID_power_heat_data:      		//0x0202
 						memcpy(&PowerHeatData, (ReadFromUsart + DATA), LEN_power_heat_data);
-					set_power_heat_data_one(&hcan1, ID_power_heat_data_one_tx, PowerHeatData.chassis_volt, PowerHeatData.chassis_current, PowerHeatData.chassis_power);
-					set_power_heat_data_two(&hcan1, ID_power_heat_data_two_tx, PowerHeatData.chassis_power_buffer, PowerHeatData.shooter_heat0, PowerHeatData.shooter_heat1, PowerHeatData.mobile_shooter_heat2);
+				  	set_power_heat_data_one(&hcan1, ID_power_heat_data_one_tx, PowerHeatData.chassis_volt, PowerHeatData.chassis_current, PowerHeatData.chassis_power);
+				  	set_power_heat_data_two(&hcan1, ID_power_heat_data_two_tx, PowerHeatData.chassis_power_buffer, PowerHeatData.shooter_id1_17mm_cooling_heat, PowerHeatData.shooter_id2_17mm_cooling_heat, PowerHeatData.shooter_id1_42mm_cooling_heat);
 					
 					break;
 					
@@ -134,6 +138,8 @@ bool Judge_Read_Data(uint8_t *ReadFromUsart)
 					
 					case ID_buff_musk:      			//0x0204
 						memcpy(&BuffMusk, (ReadFromUsart + DATA), LEN_buff_musk);
+					  set_buff_musk(&hcan1, ID_buff_musk_tx, BuffMusk.power_rune_buff);
+					/**/
 					break;
 					
 					case ID_aerial_robot_energy:      	//0x0205
@@ -149,12 +155,14 @@ bool Judge_Read_Data(uint8_t *ReadFromUsart)
 					
 					case ID_shoot_data:      			//0x0207
 						memcpy(&ShootData, (ReadFromUsart + DATA), LEN_shoot_data);
-					 set_shoot_data(&hcan1, ID_shoot_data_tx, ShootData.bullet_type,ShootData.bullet_freq ,ShootData.bullet_speed);
+					  set_shoot_data(&hcan1, ID_shoot_data_tx, ShootData.bullet_type,ShootData.shooter_id,ShootData.bullet_freq ,ShootData.bullet_speed);
 		     	//JUDGE_ShootNumCount();//发弹量统计
 					break;
 										
 					case ID_bullet_remaining:      	//0x0208 
 						memcpy(&ReBullet, (ReadFromUsart + DATA), ID_bullet_remaining);
+					  set_bullet_remaining(&hcan1, ID_bullet_remaining_tx, ReBullet.bullet_remaining_num_17mm,ReBullet.bullet_remaining_num_42mm, ReBullet.coin_remaining_num);
+
 					break;
 					
 					case ID_rfid_status:      			//0x0209
@@ -164,7 +172,6 @@ bool Judge_Read_Data(uint8_t *ReadFromUsart)
 					
 					case ID_dart_client_cmd:      			//0x020A
 						memcpy(&DartClient, (ReadFromUsart + DATA), ID_dart_client_cmd);
-					//	JUDGE_ShootNumCount();//发弹量统
 					break;
 				}
 			}
@@ -216,7 +223,7 @@ void JUDGE_Show_Data(void)
 	
 	ShowData.dataFrameHeader.data_cmd_id = 0xD180;//发给客户端的cmd,官方固定
 	//ID已经是自动读取的了
-	ShowData.dataFrameHeader.send_ID 	 = Judge_Self_ID;//发送者的ID
+	ShowData.dataFrameHeader.sender_ID 	 = Judge_Self_ID;//发送者的ID
 	ShowData.dataFrameHeader.receiver_ID = Judge_SelfClient_ID;//客户端的ID，只能为发送者机器人对应的客户端
 	
 	/*- 自定义内容 -*/
@@ -337,7 +344,7 @@ uint8_t JUDGE_ucGetRobotLevel(void)
   */
 uint16_t JUDGE_usGetRemoteHeat17(void)
 {
-	return PowerHeatData.shooter_heat0;
+	return PowerHeatData.shooter_id1_17mm_cooling_heat;
 }
 
 /**
@@ -403,7 +410,7 @@ void JUDGE_ShootNum_Clear(void)
   */
 uint16_t JUDGE_usGetHeatLimit(void)
 {
-	return GameRobotStat.shooter_heat0_cooling_limit;
+	return GameRobotStat.shooter_id1_17mm_cooling_limit;
 }
 
 /**
@@ -414,7 +421,7 @@ uint16_t JUDGE_usGetHeatLimit(void)
   */
 uint16_t JUDGE_usGetShootCold(void)
 {
-	return GameRobotStat.shooter_heat0_cooling_rate;
+	return GameRobotStat.shooter_id1_17mm_cooling_rate;
 }
 
 ///****************底盘自动闪避判断用*******************/
@@ -459,6 +466,101 @@ bool Judge_If_Death(void)
 	}
 }
 
+
+/**********************发送各车血量***********************/
+void set_robo_hp_one(CAN_HandleTypeDef* hcan, uint32_t mark, uint16_t red_1_robot_HP,uint16_t red_2_robot_HP,uint16_t red_3_robot_HP,uint16_t red_4_robot_HP){
+ CAN_TxHeaderTypeDef   TxHeader;
+	uint8_t TxData[8];
+	uint32_t TxMailBox= CAN_TX_MAILBOX1;
+	TxHeader.StdId=mark;
+  TxHeader.DLC=0x08;
+  TxHeader.IDE=CAN_ID_STD;
+  TxHeader.RTR=CAN_RTR_DATA;
+	
+	TxData[0] = red_1_robot_HP >> 8;
+	TxData[1] = red_1_robot_HP;
+	TxData[2] = red_2_robot_HP >> 8;
+	TxData[3] = red_2_robot_HP;
+	TxData[4] = red_3_robot_HP >> 8;
+	TxData[5] = red_3_robot_HP;
+	TxData[6] = red_4_robot_HP >> 8;
+	TxData[7] = red_4_robot_HP;
+
+   if(HAL_CAN_AddTxMessage(hcan,&TxHeader,TxData,&TxMailBox)!=HAL_OK)
+  {
+			Error_Handler();
+  }
+}
+void set_robo_hp_two(CAN_HandleTypeDef* hcan, uint32_t mark, uint16_t red_5_robot_HP,uint16_t red_7_robot_HP,uint16_t red_outpost_HP,uint16_t red_base_HP){
+  CAN_TxHeaderTypeDef   TxHeader;
+	uint8_t TxData[8];
+	uint32_t TxMailBox= CAN_TX_MAILBOX1;
+	TxHeader.StdId=mark;
+  TxHeader.DLC=0x08;
+  TxHeader.IDE=CAN_ID_STD;
+  TxHeader.RTR=CAN_RTR_DATA;
+	
+	TxData[0] = red_5_robot_HP >> 8;
+	TxData[1] = red_5_robot_HP;
+	TxData[2] = red_7_robot_HP >> 8;
+	TxData[3] = red_7_robot_HP;
+	TxData[4] = red_outpost_HP >> 8;
+	TxData[5] = red_outpost_HP;
+	TxData[6] = red_base_HP >> 8;
+	TxData[7] = red_base_HP;
+
+   if(HAL_CAN_AddTxMessage(hcan,&TxHeader,TxData,&TxMailBox)!=HAL_OK)
+  {
+			Error_Handler();
+  }
+}
+void set_robo_hp_three(CAN_HandleTypeDef* hcan, uint32_t mark, uint16_t blue_1_robot_HP,uint16_t blue_2_robot_HP,uint16_t blue_3_robot_HP,uint16_t blue_4_robot_HP){
+  CAN_TxHeaderTypeDef   TxHeader;
+	uint8_t TxData[8];
+	uint32_t TxMailBox= CAN_TX_MAILBOX1;
+	TxHeader.StdId=mark;
+  TxHeader.DLC=0x08;
+  TxHeader.IDE=CAN_ID_STD;
+  TxHeader.RTR=CAN_RTR_DATA;
+	
+	TxData[0] = blue_1_robot_HP >> 8;
+	TxData[1] = blue_1_robot_HP;
+	TxData[2] = blue_2_robot_HP >> 8;
+	TxData[3] = blue_2_robot_HP;
+	TxData[4] = blue_3_robot_HP >> 8;
+	TxData[5] = blue_3_robot_HP;
+	TxData[6] = blue_4_robot_HP >> 8;
+	TxData[7] = blue_4_robot_HP;
+
+   if(HAL_CAN_AddTxMessage(hcan,&TxHeader,TxData,&TxMailBox)!=HAL_OK)
+  {
+			Error_Handler();
+  }
+}
+void set_robo_hp_four(CAN_HandleTypeDef* hcan, uint32_t mark, uint16_t blue_5_robot_HP,uint16_t blue_7_robot_HP,uint16_t blue_outpost_HP){
+  CAN_TxHeaderTypeDef   TxHeader;
+	uint8_t TxData[8];
+	uint32_t TxMailBox= CAN_TX_MAILBOX1;
+	TxHeader.StdId=mark;
+  TxHeader.DLC=0x08;
+  TxHeader.IDE=CAN_ID_STD;
+  TxHeader.RTR=CAN_RTR_DATA;
+	
+	TxData[0] = blue_5_robot_HP >> 8;
+	TxData[1] = blue_5_robot_HP;
+	TxData[2] = blue_7_robot_HP >> 8;
+	TxData[3] = blue_7_robot_HP;
+	TxData[4] = blue_outpost_HP >> 8;
+	TxData[5] = blue_outpost_HP;
+
+   if(HAL_CAN_AddTxMessage(hcan,&TxHeader,TxData,&TxMailBox)!=HAL_OK)
+  {
+			Error_Handler();
+  }
+}
+
+
+
 /*****************发送补给站动作标识**********************/
 void set_supply_projectile_action(CAN_HandleTypeDef* hcan, uint32_t mark, uint8_t supply_projectile_id, uint8_t supply_robot_id, uint8_t supply_projectile_step, uint8_t supply_projectile_num)
 {
@@ -481,8 +583,8 @@ void set_supply_projectile_action(CAN_HandleTypeDef* hcan, uint32_t mark, uint8_
   }
 }
 
-/*****************比赛机器人状态数据：分为1，2，3部分**********************/
-void set_game_robot_state_one(CAN_HandleTypeDef* hcan, uint32_t mark,  uint8_t robot_id, uint8_t robot_level, uint16_t remain_HP, uint16_t max_HP, uint16_t shooter_heat0_cooling_rate)
+/*****************比赛机器人状态数据：分为1，2，3,4部分**********************/
+void set_game_robot_state_one(CAN_HandleTypeDef* hcan, uint32_t mark,  uint8_t robot_id, uint8_t robot_level, uint16_t remain_HP, uint16_t max_HP, uint16_t shooter_id1_17mm_cooling_rate)
 {
 	CAN_TxHeaderTypeDef   TxHeader;
 	uint8_t TxData[8];
@@ -498,8 +600,8 @@ void set_game_robot_state_one(CAN_HandleTypeDef* hcan, uint32_t mark,  uint8_t r
 	TxData[3] = remain_HP;
 	TxData[4] = max_HP >> 8;
 	TxData[5] = max_HP;
-	TxData[6] = shooter_heat0_cooling_rate >> 8;
-	TxData[7] = shooter_heat0_cooling_rate;
+	TxData[6] = shooter_id1_17mm_cooling_rate >> 8;
+	TxData[7] = shooter_id1_17mm_cooling_rate;
 
    if(HAL_CAN_AddTxMessage(hcan,&TxHeader,TxData,&TxMailBox)!=HAL_OK)
   {
@@ -507,7 +609,7 @@ void set_game_robot_state_one(CAN_HandleTypeDef* hcan, uint32_t mark,  uint8_t r
   }
 }
 
-void set_game_robot_state_two(CAN_HandleTypeDef* hcan, uint32_t mark,  uint16_t shooter_heat0_cooling_limit, uint16_t shooter_heat1_cooling_rate, uint16_t shooter_heat1_cooling_limit, uint8_t shooter_heat0_speed_limit, uint8_t shooter_heat1_speed_limit)
+void set_game_robot_state_two(CAN_HandleTypeDef* hcan, uint32_t mark,  uint16_t shooter_id1_17mm_cooling_limit, uint16_t shooter_id1_17mm_speed_limit, uint16_t shooter_id2_17mm_cooling_rate, uint16_t shooter_id2_17mm_cooling_limit)
 {
 	CAN_TxHeaderTypeDef   TxHeader;
 	uint8_t TxData[8];
@@ -517,14 +619,14 @@ void set_game_robot_state_two(CAN_HandleTypeDef* hcan, uint32_t mark,  uint16_t 
   TxHeader.IDE=CAN_ID_STD;
   TxHeader.RTR=CAN_RTR_DATA;
 	
-	TxData[0] = shooter_heat0_cooling_limit >> 8;
-	TxData[1] = shooter_heat0_cooling_limit;
-	TxData[2] = shooter_heat1_cooling_rate >> 8;
-	TxData[3] = shooter_heat1_cooling_rate;
-	TxData[4] = shooter_heat1_cooling_limit >> 8;
-	TxData[5] = shooter_heat1_cooling_limit;
-	TxData[6] = shooter_heat0_speed_limit;
-	TxData[7] = shooter_heat1_speed_limit;
+	TxData[0] = shooter_id1_17mm_cooling_limit >> 8;
+	TxData[1] = shooter_id1_17mm_cooling_limit;
+	TxData[2] = shooter_id1_17mm_speed_limit >> 8;
+	TxData[3] = shooter_id1_17mm_speed_limit;
+	TxData[4] = shooter_id2_17mm_cooling_rate >> 8;
+	TxData[5] = shooter_id2_17mm_cooling_rate;
+	TxData[6] = shooter_id2_17mm_cooling_limit >> 8;
+	TxData[7] = shooter_id2_17mm_cooling_limit;
 
    if(HAL_CAN_AddTxMessage(hcan,&TxHeader,TxData,&TxMailBox)!=HAL_OK)
   {
@@ -532,7 +634,7 @@ void set_game_robot_state_two(CAN_HandleTypeDef* hcan, uint32_t mark,  uint16_t 
   }
 }
 
-void set_game_robot_state_three(CAN_HandleTypeDef* hcan, uint32_t mark,  uint8_t max_chassis_power, uint8_t mains_power_gimbal_output, uint8_t mains_power_chassis_output, uint8_t mains_power_shooter_output)
+void set_game_robot_state_three(CAN_HandleTypeDef* hcan, uint32_t mark,  uint16_t shooter_id2_17mm_speed_limit, uint16_t shooter_id1_42mm_cooling_rate, uint16_t shooter_id1_42mm_cooling_limit, uint16_t shooter_id1_42mm_speed_limit)
 {
 	CAN_TxHeaderTypeDef   TxHeader;
 	uint8_t TxData[8];
@@ -542,10 +644,37 @@ void set_game_robot_state_three(CAN_HandleTypeDef* hcan, uint32_t mark,  uint8_t
   TxHeader.IDE=CAN_ID_STD;
   TxHeader.RTR=CAN_RTR_DATA;
 	
-	TxData[0] = max_chassis_power;
-	TxData[1] = mains_power_gimbal_output;
-	TxData[2] = mains_power_chassis_output;
-	TxData[3] = mains_power_shooter_output;
+	TxData[0] = shooter_id2_17mm_speed_limit >> 8;
+	TxData[1] = shooter_id2_17mm_speed_limit;
+	TxData[2] = shooter_id1_42mm_cooling_rate >> 8;
+	TxData[3] = shooter_id1_42mm_cooling_rate;
+	TxData[4] = shooter_id1_42mm_cooling_limit >> 8;
+	TxData[5] = shooter_id1_42mm_cooling_limit;
+	TxData[6] = shooter_id1_42mm_speed_limit >> 8;
+	TxData[7] = shooter_id1_42mm_speed_limit;
+
+   if(HAL_CAN_AddTxMessage(hcan,&TxHeader,TxData,&TxMailBox)!=HAL_OK)
+  {
+			Error_Handler();
+  }
+}
+
+
+void set_game_robot_state_four(CAN_HandleTypeDef* hcan, uint32_t mark,  uint16_t chassis_power_limit, uint8_t mains_power_gimbal_output, uint8_t mains_power_chassis_output, uint8_t mains_power_shooter_output)
+{
+	CAN_TxHeaderTypeDef   TxHeader;
+	uint8_t TxData[8];
+	uint32_t TxMailBox= CAN_TX_MAILBOX1;
+	TxHeader.StdId=mark;
+  TxHeader.DLC=0x08;
+  TxHeader.IDE=CAN_ID_STD;
+  TxHeader.RTR=CAN_RTR_DATA;
+	
+	TxData[0] = chassis_power_limit >> 8;
+	TxData[1] = chassis_power_limit;
+	TxData[2] = mains_power_gimbal_output;
+	TxData[3] = mains_power_chassis_output;
+	TxData[4] = mains_power_shooter_output;
   
    if(HAL_CAN_AddTxMessage(hcan,&TxHeader,TxData,&TxMailBox)!=HAL_OK)
   {
@@ -581,7 +710,7 @@ void set_power_heat_data_one(CAN_HandleTypeDef* hcan, uint32_t mark, uint16_t ch
   }
 }
 
-void set_power_heat_data_two(CAN_HandleTypeDef* hcan, uint32_t mark, uint16_t chassis_power_buffer, uint16_t shooter_heat0, uint16_t shooter_heat1, uint16_t mobile_shooter_heat2)
+void set_power_heat_data_two(CAN_HandleTypeDef* hcan, uint32_t mark, uint16_t chassis_power_buffer, uint16_t shooter_id1_17mm_cooling_heat, uint16_t shooter_id2_17mm_cooling_heat, uint16_t shooter_id1_42mm_cooling_heat)
 {
 	CAN_TxHeaderTypeDef   TxHeader;
 	uint8_t TxData[8];
@@ -593,12 +722,12 @@ void set_power_heat_data_two(CAN_HandleTypeDef* hcan, uint32_t mark, uint16_t ch
 	
 	TxData[0] = chassis_power_buffer >> 8;
 	TxData[1] = chassis_power_buffer;
-	TxData[2] = shooter_heat0 >> 8;
-	TxData[3] = shooter_heat0;
-	TxData[4] = shooter_heat1 >> 8;
-	TxData[5] = shooter_heat1;
-	TxData[6] = mobile_shooter_heat2 >> 8;
-	TxData[7] = mobile_shooter_heat2;
+	TxData[2] = shooter_id1_17mm_cooling_heat >> 8;
+	TxData[3] = shooter_id1_17mm_cooling_heat;
+	TxData[4] = shooter_id2_17mm_cooling_heat >> 8;
+	TxData[5] = shooter_id2_17mm_cooling_heat;
+	TxData[6] = shooter_id1_42mm_cooling_heat >> 8;
+	TxData[7] = shooter_id1_42mm_cooling_heat;
 
    if(HAL_CAN_AddTxMessage(hcan,&TxHeader,TxData,&TxMailBox)!=HAL_OK)
   {
@@ -606,6 +735,25 @@ void set_power_heat_data_two(CAN_HandleTypeDef* hcan, uint32_t mark, uint16_t ch
   }
 }
 
+/********************************************************/
+
+void set_buff_musk(CAN_HandleTypeDef* hcan, uint32_t mark, uint8_t power_rune_buff)
+{
+	CAN_TxHeaderTypeDef   TxHeader;
+	uint8_t TxData[8];
+	uint32_t TxMailBox= CAN_TX_MAILBOX1;
+	TxHeader.StdId=mark;
+  TxHeader.DLC=0x08;
+  TxHeader.IDE=CAN_ID_STD;
+  TxHeader.RTR=CAN_RTR_DATA;
+	
+	TxData[0] = power_rune_buff;
+
+   if(HAL_CAN_AddTxMessage(hcan,&TxHeader,TxData,&TxMailBox)!=HAL_OK)
+  {
+			Error_Handler();
+  }
+}
 
 void set_robot_hurt(CAN_HandleTypeDef* hcan, uint32_t mark, uint8_t armor_id, uint8_t hurt_type)
 {
@@ -627,7 +775,7 @@ void set_robot_hurt(CAN_HandleTypeDef* hcan, uint32_t mark, uint8_t armor_id, ui
 }
 
 
-void set_shoot_data(CAN_HandleTypeDef* hcan, uint32_t mark, uint8_t bullet_type, uint8_t bullet_freq, float bullet_speed)
+void set_shoot_data(CAN_HandleTypeDef* hcan, uint32_t mark, uint8_t bullet_type,  uint8_t shooter_id,uint8_t bullet_freq, float bullet_speed)
 {
 	CAN_TxHeaderTypeDef   TxHeader;
 	uint8_t TxData[8];
@@ -639,10 +787,11 @@ void set_shoot_data(CAN_HandleTypeDef* hcan, uint32_t mark, uint8_t bullet_type,
 
 	TxData[0] = bullet_type; 
 	TxData[1] = bullet_freq;
-	TxData[2] = ((uint8_t*)(&bullet_speed))[0];
-  TxData[3] = ((uint8_t*)(&bullet_speed))[1];
-	TxData[4] = ((uint8_t*)(&bullet_speed))[2];
-  TxData[5] = ((uint8_t*)(&bullet_speed))[3];
+	TxData[2] = bullet_freq;
+	TxData[3] = ((uint8_t*)(&bullet_speed))[0];
+  TxData[4] = ((uint8_t*)(&bullet_speed))[1];
+	TxData[5] = ((uint8_t*)(&bullet_speed))[2];
+  TxData[6] = ((uint8_t*)(&bullet_speed))[3];
 
    if(HAL_CAN_AddTxMessage(hcan,&TxHeader,TxData,&TxMailBox)!=HAL_OK)
   {
@@ -650,6 +799,29 @@ void set_shoot_data(CAN_HandleTypeDef* hcan, uint32_t mark, uint8_t bullet_type,
   }
 }
 
+
+void set_bullet_remaining(CAN_HandleTypeDef* hcan, uint32_t mark,  uint16_t bullet_remaining_num_17mm, uint16_t bullet_remaining_num_42mm, uint16_t coin_remaining_num){
+	CAN_TxHeaderTypeDef   TxHeader;
+	uint8_t TxData[8];
+	uint32_t TxMailBox= CAN_TX_MAILBOX1;
+	TxHeader.StdId=mark;
+  TxHeader.DLC=0x08;
+  TxHeader.IDE=CAN_ID_STD;
+  TxHeader.RTR=CAN_RTR_DATA;
+	
+	TxData[0] = bullet_remaining_num_17mm >> 8;
+	TxData[1] = bullet_remaining_num_17mm;
+	TxData[2] = bullet_remaining_num_42mm >> 8;
+	TxData[3] = bullet_remaining_num_42mm;
+	TxData[4] = coin_remaining_num >> 8;
+	TxData[5] = coin_remaining_num;
+
+
+   if(HAL_CAN_AddTxMessage(hcan,&TxHeader,TxData,&TxMailBox)!=HAL_OK)
+  {
+			Error_Handler();
+  }
+}
 
 
 void set_rfid_status(CAN_HandleTypeDef* hcan, uint32_t mark, uint32_t rfid_status)

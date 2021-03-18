@@ -2,7 +2,7 @@
 PID_parameter PID[8];
 //p,i,d
 float chassis_pid[3] = {20.0f, 0.0f, 10.0f};
-//ÔÆÌ¨pid
+//äº‘å°pid
 
 
 float gimbal_pitch_pid[3] = {4500.0f, 100.0f, 6000.0f};

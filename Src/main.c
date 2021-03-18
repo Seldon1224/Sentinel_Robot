@@ -38,6 +38,7 @@
 #include "Visual_Scope.h"
 #include "./ANO_DT/ANO_DT.h"
 #include "./judge/judge.h"
+#include "stdlib.h"
 /* USER CODE END Includes */
 
 /* Private typedef -----------------------------------------------------------*/
@@ -58,6 +59,9 @@
 
 /* USER CODE BEGIN PV */
 uint8_t ano_data_rec;
+extern volatile uint8_t rx_len;//½ÓÊÕµ½µÄÊý¾Ý³¤¶È
+extern volatile uint8_t recv_end_flag; //½ÓÊÕÍê³É±êÖ¾Î»
+extern uint8_t ReadFromUsart[200]; //Êý¾Ý»º´æÊý×é
 /* USER CODE END PV */
 
 /* Private function prototypes -----------------------------------------------*/
@@ -71,9 +75,9 @@ void MX_FREERTOS_Init(void);
 /* USER CODE BEGIN 0 */
 uint8_t originData[5] = {0}; //Debugä¸²å£æŽ¥æ”¶åˆ°çš„åŽŸå§‹æ•°æ®
 uint8_t DebugRevFlag;
-
-uint8_t USART3_temp[VISION_LENGTH];
-uint8_t UART6_temp[VISION_LENGTH];
+//è£åˆ¤ç³»ç»Ÿ
+//uint8_t JudgeTemp[50];
+uint8_t UART6_temp[VISION_RX_LENGTH];
 /* USER CODE END 0 */
 
 /**
@@ -119,15 +123,18 @@ int main(void)
   MX_I2C1_Init();
   /* USER CODE BEGIN 2 */
 
-  //ç³»ç»Ÿåˆå§‹åŒ–
+  //ç³»ç»Ÿåˆå§‹åŒ?
   system_Init();
-
-  HAL_UART_Receive_IT(&huart6, (uint8_t *)UART6_temp, VISION_LENGTH); //è§†è§‰ä¸²å£
-  HAL_UART_Receive_IT(&huart7, &ano_data_rec, 1);                     //ä¸²å£7-åŒ¿åä¸Šä½æœºæŽ¥æ”¶æ•°æ®
+  HAL_UART_Receive_DMA(&huart6, (uint8_t *)UART6_temp, VISION_RX_LENGTH);
+  //HAL_UART_Receive_ IT(&huart6, (uint8_t *)UART6_temp, VISION_LENGTH); //è§†è§‰ä¸²å£
+  HAL_UART_Receive_IT(&huart7, &ano_data_rec, 1); //ä¸²å£7-åŒ¿åä¸Šä½æœ?
+  //HAL_UART_Receive_IT(&huart8, JudgeTemp, 50);
+	__HAL_UART_ENABLE_IT(&huart8, UART_IT_IDLE);
+  HAL_UART_Receive_DMA(&huart8,ReadFromUsart,200);
   /* USER CODE END 2 */
 
   /* Init scheduler */
-  osKernelInitialize(); /* Call init function for freertos objects (in freertos.c) */
+  osKernelInitialize();  /* Call init function for freertos objects (in freertos.c) */
   MX_FREERTOS_Init();
   /* Start scheduler */
   osKernelStart();
@@ -175,7 +182,8 @@ void SystemClock_Config(void)
   }
   /** Initializes the CPU, AHB and APB buses clocks
   */
-  RCC_ClkInitStruct.ClockType = RCC_CLOCKTYPE_HCLK | RCC_CLOCKTYPE_SYSCLK | RCC_CLOCKTYPE_PCLK1 | RCC_CLOCKTYPE_PCLK2;
+  RCC_ClkInitStruct.ClockType = RCC_CLOCKTYPE_HCLK|RCC_CLOCKTYPE_SYSCLK
+                              |RCC_CLOCKTYPE_PCLK1|RCC_CLOCKTYPE_PCLK2;
   RCC_ClkInitStruct.SYSCLKSource = RCC_SYSCLKSOURCE_PLLCLK;
   RCC_ClkInitStruct.AHBCLKDivider = RCC_SYSCLK_DIV1;
   RCC_ClkInitStruct.APB1CLKDivider = RCC_HCLK_DIV4;
@@ -199,17 +207,13 @@ void HAL_UART_RxCpltCallback(UART_HandleTypeDef *huart)
   if (huart->Instance == USART6)
   {
     Vision_Read_Data(UART6_temp);
-    HAL_UART_Receive_IT(&huart6, (uint8_t *)UART6_temp, VISION_LENGTH);
+    // HAL_UART_Receive_IT(&huart6, (uint8_t *)UART6_temp, VISION_LENGTH);
+    HAL_UART_Receive_DMA(&huart6, (uint8_t *)UART6_temp, VISION_RX_LENGTH);
   }
   if (huart->Instance == UART7)
   {
     ANO_DT_Data_Receive_Prepare(ano_data_rec);
     HAL_UART_Receive_IT(&huart7, &ano_data_rec, 1);
-  }
-  if (huart->Instance == UART8)
-  {
-    DebugRevFlag += 1;
-    //        HAL_UART_Receive_IT(&huart6, ReadTemp, VISION_LENGTH);
   }
 }
 int fputc(int ch, FILE *f)
@@ -238,8 +242,7 @@ void HAL_TIM_PeriodElapsedCallback(TIM_HandleTypeDef *htim)
   /* USER CODE BEGIN Callback 0 */
 
   /* USER CODE END Callback 0 */
-  if (htim->Instance == TIM6)
-  {
+  if (htim->Instance == TIM6) {
     HAL_IncTick();
   }
   /* USER CODE BEGIN Callback 1 */
@@ -259,7 +262,7 @@ void Error_Handler(void)
   /* USER CODE END Error_Handler_Debug */
 }
 
-#ifdef USE_FULL_ASSERT
+#ifdef  USE_FULL_ASSERT
 /**
   * @brief  Reports the name of the source file and the source line number
   *         where the assert_param error has occurred.

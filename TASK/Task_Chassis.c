@@ -32,7 +32,7 @@ void Task_Chassis(void *argument)
     pid_calc(&pid_chassis, moto_chassis.speed_rpm, set_chassis);
     set_moto_current_all(&hcan1, 2,
                          pid_chassis.pos_out,               //1
-                         pid_revolve[GIMBAL_Below].pos_out, //2  下拨盘
+                         pid_revolve[GIMBAL_Below].delta_out, //2  下拨盘
                          0,                                 //3
                          0);                                //4
     osDelay(3);
@@ -48,24 +48,25 @@ void GET_Chassis_Dir_Spd()
 		flag_auto_aim = 0;
     break;
   case AutoAim_mode:
-		if(flag_auto_aim == 0)
-		{
-			flag_auto_aim = 1;
-			set_chassis = 2000;
-			count_offset = moto_chassis.round_cnt;
-		}
-		current_count = moto_chassis.round_cnt - count_offset;
+//		if(flag_auto_aim == 0)
+//		{
+//			flag_auto_aim = 1;
+//			set_chassis = 2000;
+//			count_offset = moto_chassis.round_cnt;
+//		}
+//		current_count = moto_chassis.round_cnt - count_offset;
 
-		//达到最大圈数切换方向
-		if(abs(current_count) >= max_count)
-		{
-				if(set_chassis == 2000)
-					set_chassis = -2000;
-				else if(set_chassis == -2000)
-					set_chassis = 2000;
-				count_offset = moto_chassis.round_cnt;
-				current_count = moto_chassis.round_cnt - count_offset;
-		}			
+//		//达到最大圈数切换方向
+//		if(abs(current_count) >= max_count)
+//		{
+//				if(set_chassis == 2000)
+//					set_chassis = -2000;
+//				else if(set_chassis == -2000)
+//					set_chassis = 2000;
+//				count_offset = moto_chassis.round_cnt;
+//				current_count = moto_chassis.round_cnt - count_offset;
+	set_chassis = 2000 * rc.CONTROLLER.ch3 / 660.0f;
+//		}			
     break;
   case Disable_mode:
     set_chassis = 0;

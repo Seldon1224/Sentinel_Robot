@@ -9,7 +9,6 @@ void Task_InfoUpdate(void *argument)
 {
 	for (;;)
 	{
-		Debug();			   //debug串口
 		//2020.11.11新增，从can_receive修改到此
 		keyboard_scan();
 		GET_Control_Mode();
@@ -75,28 +74,4 @@ uint16_t ucharToSet() //数据格式：char[5] -> (0~65535)
 	return valueToSet;
 }
 
-void Debug()
-{
-	if (readyFlag)
-	{
-		switch (DebugRevFlag) //Debug函数使用方法：1. 调整DebugRevFlag阈值，比如PID三个参数就在case3执行完成后置零。
-		{
-		case 1:
-			pid[0] = ucharToSet();
-			break;
-		case 2:
-			pid[1] = ucharToSet();
-			break;
-		case 3:
-			pid[2] = ucharToSet();
-			DebugRevFlag = 0;
-			//	执行函数写这里，例如PID_SET
 
-			//
-			break;
-		default:
-			break;
-		}
-		readyFlag = 0;
-	}
-}

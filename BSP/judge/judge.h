@@ -1,8 +1,12 @@
+#ifndef _JUDGE_H
+#define _JUDGE_H
+
 #include "main.h"
 #include "stdbool.h"
 #include "string.h"
 #include "can.h"
 #include "./judge/CRC.h"
+#include "./NR_Printf/NR_Printf.h"
 
 #define    LEN_HEADER    5        //帧头长
 #define    LEN_CMDID     2        //命令码长度
@@ -86,8 +90,13 @@ typedef enum
 typedef enum
 { 
 	ID_game_state_tx       		               	= 0x0F1,//比赛状态数据
-	ID_game_result_tx 	   				            = 0x0F2,//比赛结果数据                   
-	ID_game_robot_HP_tx                    	  = 0x0F3,//比赛机器人存活数据
+	ID_game_result_tx 	   				            = 0x0F2,//比赛结果数据
+	
+	ID_game_robot_HP_one_tx                   = 0x013,//比赛机器人存活数据 1           *****
+	ID_game_robot_HP_two_tx                   = 0x023,//比赛机器人存活数据 2           *****
+	ID_game_robot_HP_three_tx                 = 0x033,//比赛机器人存活数据 3           *****
+	ID_game_robot_HP_four_tx                  = 0x043,//比赛机器人存活数据 4           *****
+	
 	ID_dart_status_tx                         = 0x0F4,//人工智能挑战赛加成与惩罚区状态
 	ID_ICRA_buff_debuff_zone_status_tx        = 0x0F5,//飞镖发射状态
 	ID_event_data_tx  				           	    = 0x1F1,//场地事件数据 
@@ -98,16 +107,17 @@ typedef enum
 	ID_game_robot_state_one_tx    			      = 0x211,//比赛机器人状态数据 1           *****
 	ID_game_robot_state_two_tx   			        = 0x221,//比赛机器人状态数据 2           *****
   ID_game_robot_state_three_tx    			    = 0x231,//比赛机器人状态数据 3           *****
+	ID_game_robot_state_four_tx               = 0x241,//比赛机器人状态数据 4           *****
 	
 	ID_power_heat_data_one_tx    			        = 0x212,//实时功率热量数据   1           *****
 	ID_power_heat_data_two_tx    			        = 0x222,//实时功率热量数据   2           *****
 	
 	ID_game_robot_pos_tx        	            = 0x2F3,//机器人位置数据
-	ID_buff_musk_tx					                  = 0x2F4,//机器人增益数据
+	ID_buff_musk_tx					                  = 0x2F4,//机器人增益数据                 *****
 	ID_aerial_robot_energy_tx			            = 0x2F5,//空中机器人能量状态数据
 	ID_robot_hurt_tx					                = 0x2F6,//伤害状态数据                   *****
 	ID_shoot_data_tx					                = 0x2F7,//实时射击数据                   *****
-	ID_bullet_remaining_tx                    = 0x2F8,//子弹剩余发射数(空中机器人，哨兵机器人以及 ICRA 机器人主控发送)            
+	ID_bullet_remaining_tx                    = 0x2F8,//子弹剩余发射数                 *****             
   ID_rfid_status_tx                         = 0x2F9,//机器人 RFID 状态               *****
 	ID_dart_client_cmd_tx                     = 0x2FA, //飞镖机器人客户端指令数据
 
@@ -119,17 +129,17 @@ typedef enum
 //命令码数据段长,根据官方协议来定义长度
 typedef enum
 {
-	LEN_game_state       		             	= 3, //比赛状态数据
+	LEN_game_state       		             	= 11, //比赛状态数据
 	LEN_game_result 	   				          = 1, //比赛结果数据
-	LEN_game_robot_HP_t                 	= 32,//比赛机器人存活数据
+	LEN_game_robot_HP_t                 	= 28,//比赛机器人存活数据
 	LEN_dart_status_t                     = 3, //人工智能挑战赛加成与惩罚区状态
-	LEN_ICRA_buff_debuff_zone_status_t    = 3, //飞镖发射状态
-	LEN_event_data  				           	  = 4, //场地事件数据 
-	LEN_supply_projectile_action_t   	    = 4, //补给站动作标识
+	LEN_ICRA_buff_debuff_zone_status_t    = 11, //飞镖发射状态
+	LEN_event_data  				           	  = 3, //场地事件数据 
+	LEN_supply_projectile_action_t   	    = 2, //补给站动作标识
 	LEN_referee_warning_t 	              = 2, //裁判警告信息
 	LEN_dart_remaining_time_t             = 1, //飞镖发射口倒计时
-	LEN_game_robot_state    			        = 18,//比赛机器人状态数据
-	LEN_power_heat_data    			          = 16,//实时功率热量数据
+	LEN_game_robot_state    			        = 15,//比赛机器人状态数据
+	LEN_power_heat_data    			          = 14,//实时功率热量数据
 	LEN_game_robot_pos        	          = 16,//机器人位置数据
 	LEN_buff_musk					                = 1, //机器人增益数据
 	LEN_aerial_robot_energy			          = 3, //空中机器人能量状态数据
@@ -157,6 +167,7 @@ typedef __packed struct
 	uint8_t game_type : 4;
 	uint8_t game_progress : 4;
 	uint16_t stage_remain_time;
+	uint64_t  SyncTimeStamp;
 } ext_game_state_t; 
 
 
@@ -170,22 +181,25 @@ typedef __packed struct
 /* ID: 0x0003  Byte:  2    比赛机器人存活数据 */
 typedef __packed struct
 {
+
  uint16_t red_1_robot_HP;
  uint16_t red_2_robot_HP;
  uint16_t red_3_robot_HP;
  uint16_t red_4_robot_HP;
+	
  uint16_t red_5_robot_HP;
  uint16_t red_7_robot_HP;
  uint16_t red_outpost_HP;
  uint16_t red_base_HP;
+	
  uint16_t blue_1_robot_HP;
  uint16_t blue_2_robot_HP;
  uint16_t blue_3_robot_HP;
  uint16_t blue_4_robot_HP;
+	
  uint16_t blue_5_robot_HP;
  uint16_t blue_7_robot_HP;
  uint16_t blue_outpost_HP;
- uint16_t blue_base_HP;
 } ext_game_robot_HP_t;
 
 
@@ -212,7 +226,14 @@ typedef __packed struct
  uint8_t F5_zone_buff_debuff_status:3;
  uint8_t F6_zone_status:1;
  uint8_t F6_zone_buff_debuff_status:3;
+	
+ uint16_t red1_bullet_left;
+ uint16_t red2_bullet_left;
+ uint16_t blue1_bullet_left;
+ uint16_t blue2_bullet_left;	
 }ext_ICRA_buff_debuff_zone_status_t;
+
+
 
 
 /* ID: 0x0101  Byte:  4    场地事件数据 */
@@ -236,6 +257,7 @@ typedef __packed struct
 typedef __packed struct
 {
  uint8_t level;
+	
  uint8_t foul_robot_id;
 } ext_referee_warning_t;
 
@@ -254,29 +276,35 @@ typedef __packed struct
 	uint8_t robot_level;                    //1一级，2二级，3三级
 	uint16_t remain_HP;                     //机器人剩余血量
 	uint16_t max_HP;                        //机器人满血量
-	uint16_t shooter_heat0_cooling_rate;    //机器人 17mm 子弹热量冷却速度 单位 /s
-	uint16_t shooter_heat0_cooling_limit;   // 机器人 17mm 子弹热量上限
-	uint16_t shooter_heat1_cooling_rate;   
-	uint16_t shooter_heat1_cooling_limit; 
-  uint8_t shooter_heat0_speed_limit;
-  uint8_t shooter_heat1_speed_limit;
-  uint8_t max_chassis_power;  
-	uint8_t mains_power_gimbal_output : 1;  
-	uint8_t mains_power_chassis_output : 1;  
-	uint8_t mains_power_shooter_output : 1; 
+  uint16_t shooter_id1_17mm_cooling_rate;
+	
+  uint16_t shooter_id1_17mm_cooling_limit;
+  uint16_t shooter_id1_17mm_speed_limit;
+  uint16_t shooter_id2_17mm_cooling_rate;
+  uint16_t shooter_id2_17mm_cooling_limit;
+	
+  uint16_t shooter_id2_17mm_speed_limit;
+  uint16_t shooter_id1_42mm_cooling_rate;
+  uint16_t shooter_id1_42mm_cooling_limit;
+  uint16_t shooter_id1_42mm_speed_limit;
+	
+  uint16_t chassis_power_limit;
+  uint8_t mains_power_gimbal_output : 1;
+  uint8_t mains_power_chassis_output : 1;
+  uint8_t mains_power_shooter_output : 1;
 } ext_game_robot_state_t; 
 
 
 /* ID: 0X0202  Byte: 16    实时功率热量数据 */
 typedef __packed struct 
 { 
-	uint16_t chassis_volt;   
-	uint16_t chassis_current;    
-	float chassis_power;           //瞬时功率 
-	uint16_t chassis_power_buffer;//60焦耳缓冲能量
-	uint16_t shooter_heat0;        //17mm
-	uint16_t shooter_heat1;  
-	uint16_t mobile_shooter_heat2;//机动17mm热量
+ uint16_t chassis_volt;
+ uint16_t chassis_current;
+ float chassis_power;
+ uint16_t chassis_power_buffer;
+ uint16_t shooter_id1_17mm_cooling_heat;
+ uint16_t shooter_id2_17mm_cooling_heat;
+ uint16_t shooter_id1_42mm_cooling_heat;
 } ext_power_heat_data_t; 
 
 
@@ -293,14 +321,13 @@ typedef __packed struct
 /* ID: 0x0204  Byte:  1    机器人增益数据 */
 typedef __packed struct 
 { 
-	uint8_t power_rune_buff; 
+	uint8_t power_rune_buff;  // bit 0：机器人血量补血状态 bit 1：枪口热量冷却加速 bit 2：机器人防御加成 bit 3：机器人攻击加成
 } ext_buff_musk_t; 
 
 
 /* ID: 0x0205  Byte:  3    空中机器人能量状态数据 */
 typedef __packed struct 
 { 
-	uint8_t energy_point;
 	uint8_t attack_time; 
 } aerial_robot_energy_t; 
 
@@ -316,15 +343,18 @@ typedef __packed struct
 /* ID: 0x0207  Byte:  6    实时射击数据 */
 typedef __packed struct 
 { 
-	uint8_t bullet_type;   
-	uint8_t bullet_freq;   
-	float bullet_speed;  
+ uint8_t bullet_type;
+ uint8_t shooter_id;
+ uint8_t bullet_freq;
+ float bullet_speed; 
 } ext_shoot_data_t; 
 
-/* ID: 0x0208  Byte:  2    子弹剩余发射数（仅空中和哨兵） */
+/* ID: 0x0208  Byte:  2    子弹剩余发射数 */
 typedef __packed struct
 {
- uint16_t bullet_remaining_num;
+ uint16_t bullet_remaining_num_17mm;
+ uint16_t bullet_remaining_num_42mm;
+ uint16_t coin_remaining_num;
 } ext_bullet_remaining_t;
 
 
@@ -383,9 +413,9 @@ typedef __packed struct
 /* 交互数据接收信息：0x0301  */
 typedef __packed struct 
 { 
-	uint16_t data_cmd_id;    
-	uint16_t send_ID;    
-	uint16_t receiver_ID; 
+ uint16_t data_cmd_id;
+ uint16_t sender_ID;
+ uint16_t receiver_ID; 
 } ext_student_interactive_header_data_t; 
 
 
@@ -463,27 +493,27 @@ typedef __packed struct
 
 extern ext_game_state_t       				        GameState;					      //0x0001
 extern ext_game_result_t            		      GameResult;				    	  //0x0002
-extern ext_game_robot_HP_t                   RoboHP;                   //0x0003
-extern ext_dart_status_t                     DartState;                //0x0004
-//ext_ICRA_buff_debuff_zone_status_t                            //0x0005智能赛      xxxxxx
-extern ext_event_data_t        			        EventData;				      	//0x0101
-extern ext_supply_projectile_action_t		    SupplyProjectileAction;	  //0x0102 补给站       *****
-extern ext_referee_warning_t 	              RefWarning;               //0x0104
-extern ext_dart_remaining_time_t             DartTime;                 //0x0105
-extern ext_game_robot_state_t			  	      GameRobotStat;				    //0x0201 机器人状态   *****
+extern ext_game_robot_HP_t                    RoboHP;                   //0x0003
+extern ext_dart_status_t                      DartState;                //0x0004
+//ext_ICRA_buff_debuff_zone_status_t                                    //0x0005智能赛       xxxxxx
+extern ext_event_data_t        			          EventData;				      	//0x0101
+extern ext_supply_projectile_action_t		      SupplyProjectileAction;	  //0x0102 补给站       *****
+extern ext_referee_warning_t 	                RefWarning;               //0x0104
+extern ext_dart_remaining_time_t              DartTime;                 //0x0105
+extern ext_game_robot_state_t			  	        GameRobotStat;				    //0x0201 机器人状态   *****
 extern ext_power_heat_data_t		  		        PowerHeatData;				    //0x0202 功率热量     *****
-extern ext_game_robot_pos_t			            GameRobotPos;				      //0x0203
+extern ext_game_robot_pos_t			              GameRobotPos;				      //0x0203
 extern ext_buff_musk_t					              BuffMusk;				      	  //0x0204
 extern aerial_robot_energy_t				          AerialRobotEnergy;	  		//0x0205
-extern ext_robot_hurt_t				              RobotHurt;					      //0x0206 伤害类型     *****
-extern ext_shoot_data_t					            ShootData;					      //0x0207 射击信息     *****
-extern ext_bullet_remaining_t                ReBullet;                 //0x0208      
-extern ext_rfid_status_t                     RFIDState;                //0x0209 RFID状态     *****
-extern ext_dart_client_cmd_t                 DartClient;               //0x020A
+extern ext_robot_hurt_t				                RobotHurt;					      //0x0206 伤害类型     *****
+extern ext_shoot_data_t					              ShootData;					      //0x0207 射击信息     *****
+extern ext_bullet_remaining_t                 ReBullet;                 //0x0208      
+extern ext_rfid_status_t                      RFIDState;                //0x0209 RFID状态     *****
+extern ext_dart_client_cmd_t                  DartClient;               //0x020A
 
-extern xFrameHeader                          FrameHeader;	          	//发送帧头信息
-extern ext_SendClientData_t                  ShowData;			            //客户端信息
-extern ext_CommunatianData_t                 CommuData;	             	//队友通信信息
+extern xFrameHeader                           FrameHeader;	          	//发送帧头信息
+extern ext_SendClientData_t                   ShowData;			            //客户端信息
+extern ext_CommunatianData_t                  CommuData;	             	//队友通信信息
 
 
 
@@ -507,15 +537,29 @@ uint16_t JUDGE_usGetShootCold(void);
 bool JUDGE_IfArmorHurt(void);
 bool Judge_If_Death(void);
 
+void set_robo_hp_one(CAN_HandleTypeDef* hcan, uint32_t mark, uint16_t red_1_robot_HP,uint16_t red_2_robot_HP,uint16_t red_3_robot_HP,uint16_t red_4_robot_HP);
+void set_robo_hp_two(CAN_HandleTypeDef* hcan, uint32_t mark, uint16_t red_5_robot_HP,uint16_t red_7_robot_HP,uint16_t red_outpost_HP,uint16_t red_base_HP);
+void set_robo_hp_three(CAN_HandleTypeDef* hcan, uint32_t mark, uint16_t blue_1_robot_HP,uint16_t blue_2_robot_HP,uint16_t blue_3_robot_HP,uint16_t blue_4_robot_HP);
+void set_robo_hp_four(CAN_HandleTypeDef* hcan, uint32_t mark, uint16_t blue_5_robot_HP,uint16_t blue_7_robot_HP,uint16_t blue_outpost_HP);
+
 void set_supply_projectile_action(CAN_HandleTypeDef* hcan, uint32_t mark, uint8_t supply_projectile_id, uint8_t supply_robot_id, uint8_t supply_projectile_step, uint8_t supply_projectile_num);
-void set_game_robot_state_one(CAN_HandleTypeDef* hcan, uint32_t mark,  uint8_t robot_id, uint8_t robot_level, uint16_t remain_HP, uint16_t max_HP, uint16_t shooter_heat0_cooling_rate);
-void set_game_robot_state_two(CAN_HandleTypeDef* hcan, uint32_t mark,  uint16_t shooter_heat0_cooling_limit, uint16_t shooter_heat1_cooling_rate, uint16_t shooter_heat1_cooling_limit, uint8_t shooter_heat0_speed_limit, uint8_t shooter_heat1_speed_limit);
-void set_game_robot_state_three(CAN_HandleTypeDef* hcan, uint32_t mark,  uint8_t max_chassis_power, uint8_t mains_power_gimbal_output, uint8_t mains_power_chassis_output, uint8_t mains_power_shooter_output);
+
+void set_game_robot_state_one(CAN_HandleTypeDef* hcan, uint32_t mark,  uint8_t robot_id, uint8_t robot_level, uint16_t remain_HP, uint16_t max_HP, uint16_t shooter_id1_17mm_cooling_rate);
+void set_game_robot_state_two(CAN_HandleTypeDef* hcan, uint32_t mark,  uint16_t shooter_id1_17mm_cooling_limit, uint16_t shooter_id1_17mm_speed_limit, uint16_t shooter_id2_17mm_cooling_rate, uint16_t shooter_id2_17mm_cooling_limit);
+void set_game_robot_state_three(CAN_HandleTypeDef* hcan, uint32_t mark,  uint16_t shooter_id2_17mm_speed_limit, uint16_t shooter_id1_42mm_cooling_rate, uint16_t shooter_id1_42mm_cooling_limit, uint16_t shooter_id1_42mm_speed_limit);
+void set_game_robot_state_four(CAN_HandleTypeDef* hcan, uint32_t mark,  uint16_t chassis_power_limit, uint8_t mains_power_gimbal_output, uint8_t mains_power_chassis_output, uint8_t mains_power_shooter_output);
+
 void set_power_heat_data_one(CAN_HandleTypeDef* hcan, uint32_t mark, uint16_t chassis_volt, uint16_t chassis_current, float chassis_power);
-void set_power_heat_data_two(CAN_HandleTypeDef* hcan, uint32_t mark, uint16_t chassis_power_buffer, uint16_t shooter_heat0, uint16_t shooter_heat1, uint16_t mobile_shooter_heat2);
+void set_power_heat_data_two(CAN_HandleTypeDef* hcan, uint32_t mark, uint16_t chassis_power_buffer, uint16_t shooter_id1_17mm_cooling_heat, uint16_t shooter_id2_17mm_cooling_heat, uint16_t shooter_id1_42mm_cooling_heat);
+
+
+void set_buff_musk(CAN_HandleTypeDef* hcan,uint32_t mark, uint8_t power_rune_buff);
 void set_robot_hurt(CAN_HandleTypeDef* hcan, uint32_t mark, uint8_t armor_id, uint8_t hurt_type);
-void set_shoot_data(CAN_HandleTypeDef* hcan, uint32_t mark, uint8_t bullet_type, uint8_t bullet_freq, float bullet_speed);
+void set_shoot_data(CAN_HandleTypeDef* hcan, uint32_t mark, uint8_t bullet_type, uint8_t shooter_id, uint8_t bullet_freq, float bullet_speed);
+void set_bullet_remaining(CAN_HandleTypeDef* hcan, uint32_t mark,  uint16_t bullet_remaining_num_17mm, uint16_t bullet_remaining_num_42mm, uint16_t coin_remaining_num);
 void set_rfid_status(CAN_HandleTypeDef* hcan, uint32_t mark, uint32_t rfid_status);
 
 void transmit_judge_info(CAN_HandleTypeDef* hcan, int16_t mark, int16_t iq1, int16_t iq2, int16_t iq3, int16_t iq4);
+
+#endif
 
