@@ -24,6 +24,8 @@
 /* Private includes ----------------------------------------------------------*/
 /* USER CODE BEGIN Includes */
 #include "./remote_control/remote_control.h"
+#include "./judge/judge.h"
+#include "stdlib.h"
 /* USER CODE END Includes */
 
 /* Private typedef -----------------------------------------------------------*/
@@ -63,6 +65,7 @@ extern I2C_HandleTypeDef hi2c1;
 extern DMA_HandleTypeDef hdma_uart7_rx;
 extern DMA_HandleTypeDef hdma_uart7_tx;
 extern DMA_HandleTypeDef hdma_uart8_rx;
+extern DMA_HandleTypeDef hdma_uart8_tx;
 extern DMA_HandleTypeDef hdma_usart1_rx;
 extern UART_HandleTypeDef huart7;
 extern UART_HandleTypeDef huart8;
@@ -72,7 +75,10 @@ extern UART_HandleTypeDef huart6;
 extern TIM_HandleTypeDef htim6;
 
 /* USER CODE BEGIN EV */
-
+uint32_t tmp_flag;
+volatile uint8_t rx_len ;//���յ������ݳ���
+volatile uint8_t recv_end_flag; //������ɱ�־λ
+uint8_t ReadFromUsart[200] = {0}; //���ݻ�������
 /* USER CODE END EV */
 
 /******************************************************************************/
@@ -170,6 +176,20 @@ void DebugMon_Handler(void)
 /* For the available peripheral interrupt handler names,                      */
 /* please refer to the startup file (startup_stm32f4xx.s).                    */
 /******************************************************************************/
+
+/**
+  * @brief This function handles DMA1 stream0 global interrupt.
+  */
+void DMA1_Stream0_IRQHandler(void)
+{
+  /* USER CODE BEGIN DMA1_Stream0_IRQn 0 */
+
+  /* USER CODE END DMA1_Stream0_IRQn 0 */
+  HAL_DMA_IRQHandler(&hdma_uart8_tx);
+  /* USER CODE BEGIN DMA1_Stream0_IRQn 1 */
+
+  /* USER CODE END DMA1_Stream0_IRQn 1 */
+}
 
 /**
   * @brief This function handles DMA1 stream1 global interrupt.
@@ -373,6 +393,24 @@ void UART7_IRQHandler(void)
 void UART8_IRQHandler(void)
 {
   /* USER CODE BEGIN UART8_IRQn 0 */
+	
+
+    uint32_t temp;
+    tmp_flag =__HAL_UART_GET_FLAG(&huart8,UART_FLAG_IDLE); //��ȡIDLE��־λ
+    if(tmp_flag != RESET)                                  //idle��־����λ
+    { 
+        __HAL_UART_CLEAR_IDLEFLAG(&huart8);                //�����־λ
+        temp = huart8.Instance->SR;                        //���״̬�Ĵ���SR,HAL��USART_TypeDef�ṹ��������ΪISR��USART Interrupt and status register������ȡSR��������üĴ���
+        temp = huart8.Instance->DR;                        //��ȡ���ݼĴ����е�����,��ȡDR
+        HAL_UART_DMAStop(&huart8);
+			temp  = hdma_uart8_rx.Instance->NDTR;
+       rx_len =  200 - temp;                              //�ܼ�����ȥδ��������ݸ������õ��Ѿ����յ����ݸ���
+			 //recv_end_flag = 1;                                  //������ɱ�־λ��1
+			 Judge_Read_Data(ReadFromUsart);                         
+		   memset(ReadFromUsart, 0, 200);
+			 HAL_UART_Receive_DMA(&huart8,ReadFromUsart,200); 
+			tmp_flag=0;
+    }
 
   /* USER CODE END UART8_IRQn 0 */
   HAL_UART_IRQHandler(&huart8);

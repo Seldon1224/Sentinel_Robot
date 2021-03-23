@@ -236,7 +236,7 @@ void StartSendData(void *argument)
 					(cur_pit[GIMBAL_Below]+VisionRecvData.pitch_angle)*100,
 					0);
 		//ANO_DT_Send_Udata(moto_chassis[3].angle,moto_chassis[3].speed_rpm,4,5,6,7,8,9,0);
-		//VisualDisplay(mpu_data.yaw, mpu_data.pitch, mpu_data.roll, 0);  //bugå¾…ä¿® åæ ‡VisualScope_Outputä¸²å£å‘é?å¤„
+		//VisualDisplay(mpu_data.yaw, mpu_data.pitch, mpu_data.roll, 0);  //bugå¾…ä¿® åæ ‡VisualScope_Outputä¸²å£å‘ï¿½?ï¿½å¤„
 		osDelay(10);
   }
   /* USER CODE END StartSendData */
@@ -265,8 +265,8 @@ void Task_500ms(void *argument)
 			VisionSendData.pitch_angle = cur_pit[GIMBAL_Below];
 			VisionSendData.yaw_speed = moto_yaw[1].speed_rpm;		 
 			VisionSendData.pitch_speed = moto_pit[1].speed_rpm;
-			VisionSendData.target_mode = 0; //×ÔÃéÄ£Ê½{ 0:ÆÕÍ¨×ÔÃé 1:µõÉä 2:ÄÜÁ¿»ú¹Ø}
-			//Ô¤Áô
+			VisionSendData.target_mode = 0; //ï¿½ï¿½ï¿½ï¿½Ä£Ê½{ 0:ï¿½ï¿½Í¨ï¿½ï¿½ï¿½ï¿½ 1:ï¿½ï¿½ï¿½ï¿½ 2:ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½}
+			//Ô¤ï¿½ï¿½
 			VisionSendData.blank_a = 0;
 			VisionSendData.blank_b = 0;
 			VisionSendData.blank_c= 0;

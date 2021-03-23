@@ -38,6 +38,7 @@
 #include "Visual_Scope.h"
 #include "./ANO_DT/ANO_DT.h"
 #include "./judge/judge.h"
+#include "stdlib.h"
 /* USER CODE END Includes */
 
 /* Private typedef -----------------------------------------------------------*/
@@ -58,6 +59,9 @@
 
 /* USER CODE BEGIN PV */
 uint8_t ano_data_rec;
+extern volatile uint8_t rx_len;//���յ������ݳ���
+extern volatile uint8_t recv_end_flag; //������ɱ�־λ
+extern uint8_t ReadFromUsart[200]; //���ݻ�������
 /* USER CODE END PV */
 
 /* Private function prototypes -----------------------------------------------*/
@@ -72,7 +76,7 @@ void MX_FREERTOS_Init(void);
 uint8_t originData[5] = {0}; //Debug串口接收到的原始数据
 uint8_t DebugRevFlag;
 //裁判系统
-uint8_t JudgeTemp[50];
+//uint8_t JudgeTemp[50];
 uint8_t UART6_temp[VISION_RX_LENGTH];
 /* USER CODE END 0 */
 
@@ -119,15 +123,14 @@ int main(void)
   MX_I2C1_Init();
   /* USER CODE BEGIN 2 */
 
-
-  //系统初始化
+  //系统初始�?
   system_Init();
-//  HAL_UART_Receive_DMA(&huart6, (uint8_t *)UART6_temp, VISION_RX_LENGTH);
-   HAL_UART_Receive_IT(&huart6, (uint8_t *)UART6_temp, VISION_RX_LENGTH); //视觉串口
-	 HAL_UART_Receive_IT(&huart7, &ano_data_rec, 1); //串口7-匿名上位机
-
-  HAL_UART_Receive_IT(&huart8, JudgeTemp, 50);
-	
+  HAL_UART_Receive_DMA(&huart6, (uint8_t *)UART6_temp, VISION_RX_LENGTH);
+  //HAL_UART_Receive_ IT(&huart6, (uint8_t *)UART6_temp, VISION_LENGTH); //视觉串口
+  HAL_UART_Receive_IT(&huart7, &ano_data_rec, 1); //串口7-匿名上位�?
+  //HAL_UART_Receive_IT(&huart8, JudgeTemp, 50);
+	__HAL_UART_ENABLE_IT(&huart8, UART_IT_IDLE);
+  HAL_UART_Receive_DMA(&huart8,ReadFromUsart,200);
   /* USER CODE END 2 */
 
   /* Init scheduler */
@@ -211,10 +214,6 @@ void HAL_UART_RxCpltCallback(UART_HandleTypeDef *huart)
   {
     ANO_DT_Data_Receive_Prepare(ano_data_rec);
     HAL_UART_Receive_IT(&huart7, &ano_data_rec, 1);
-  }
-  if (huart->Instance == UART8)
-  {
-    HAL_UART_Receive_IT(&huart8, JudgeTemp, 50);
   }
 }
 int fputc(int ch, FILE *f)
