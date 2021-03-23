@@ -22,8 +22,9 @@
 #define AUTO_RATE_VALUE (0.2f)
 
 #define FORMAT_Angle(a) (a * 360.0f / 8192)
-#define YAW_BELOW_MID_POS 2700
-#define PIT_BELOW_MID_POS 3000
+#define YAW_BELOW_MID_POS 3014
+#define PIT_BELOW_MID_POS 3476
+
 #define YAW_ABOVE_MID_POS 2735
 #define PIT_ABOVE_MID_POS 3313
 typedef struct

@@ -36,6 +36,8 @@
 #include "./remote_control/remote_control.h"
 #include "Robo_config.h"
 #include "Visual_Scope.h"
+#include "Vision.h"
+#include "can_receive.h"
 /* USER CODE END Includes */
 
 /* Private typedef -----------------------------------------------------------*/
@@ -224,9 +226,9 @@ void StartSendData(void *argument)
 //					set_spd[2], 
 //					-set_spd[3],0);
 				 ANO_DT_Display(
-					cur_yaw[GIMBAL_Above]*100,
+					VisionRecvData.time,
 					cur_pit[GIMBAL_Below]*100, 
-				  VisionRecvData.pitch_angle*100,
+				  set_pit[GIMBAL_Below]*100,
 					VisionRecvData.yaw_angle*100,
 					cur_yaw[GIMBAL_Below]*100, //5
 					(cur_yaw[GIMBAL_Below]+VisionRecvData.yaw_angle)*100,
@@ -247,14 +249,34 @@ void StartSendData(void *argument)
 * @retval None
 */
 /* USER CODE END Header_Task_500ms */
+uint8_t SendData[VISION_TX_LENGTH];
 void Task_500ms(void *argument)
 {
   /* USER CODE BEGIN Task_500ms */
   /* Infinite loop */
+	
   for(;;)
   {
-    //500ms
-		osDelay(500);
+			VisionSendData.SOF = 0xA5;
+			VisionSendData.CmdID = 0x01;
+			//memcpy(&VisionSendData.yaw_angle, &cur_yaw[GIMBAL_Below], 4);
+//			memcpy(&VisionSendData.pitch_angle, &cur_pit[GIMBAL_Below], 4);
+		  VisionSendData.yaw_angle = cur_yaw[GIMBAL_Below];
+			VisionSendData.pitch_angle = cur_pit[GIMBAL_Below];
+			VisionSendData.yaw_speed = moto_yaw[1].speed_rpm;		 
+			VisionSendData.pitch_speed = moto_pit[1].speed_rpm;
+			VisionSendData.target_mode = 0; //自瞄模式{ 0:普通自瞄 1:吊射 2:能量机关}
+			//预留
+			VisionSendData.blank_a = 0;
+			VisionSendData.blank_b = 0;
+			VisionSendData.blank_c= 0;
+			VisionSendData.blank_e= 0;
+			VisionSendData.blank_f= 0;
+			VisionSendData.TOF = 0xA6;
+			memcpy(SendData, &VisionSendData, VISION_TX_LENGTH);
+			HAL_UART_Transmit(&huart6, SendData, VISION_TX_LENGTH, 0xFF);
+		//1ms
+		osDelay(1);
   }
   /* USER CODE END Task_500ms */
 }

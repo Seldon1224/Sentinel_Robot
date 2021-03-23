@@ -45,10 +45,10 @@ void Gimbal_Send_Current()
 	set_moto_current_all(&hcan1, 0,							   //0x1ff
 						 0,									   //1
 						 pid_pit[GIMBAL_Above].pos_out,		   //2
-						 pid_yaw_spd[GIMBAL_Below].delta_out,  //3 ---下yaw
+						 pid_yaw_spd[GIMBAL_Below].pos_out,  //3 ---下yaw
 															   //pid_yaw[GIMBAL_Below].pos_out,
 															   //pid_pit[GIMBAL_Below].pos_out); //4 ---下pit
-						 pid_pit_spd[GIMBAL_Below].delta_out); //4 ---下pit
+						 pid_pit_spd[GIMBAL_Below].pos_out); //4 ---下pit
 
 	set_moto_current_all(&hcan1, 1, //0x2ff
 						 0,			//5 ---上yaw
@@ -73,7 +73,7 @@ void GET_Gimbal_Dir_xyw(void)
 		{
 			//			set_pit[GIMBAL_Above] = -rc.CONTROLLER.ch2 * 30.0f / 660; //PITCH轴为绝对位置
 			//			set_yaw[GIMBAL_Above] = rc.CONTROLLER.ch1 * 60.0f / 660;
-			//			Gun_Motor_SHOOT();
+			 			  Gun_Motor_SHOOT();
 		}
 		else if (rc.CONTROLLER.sw2 == RC_SW_MID)
 		{
@@ -81,7 +81,7 @@ void GET_Gimbal_Dir_xyw(void)
 		}
 		else if (rc.CONTROLLER.sw2 == RC_SW_DOWN)
 		{
-			Gun_Motor_SHOOT();
+//			Gun_Motor_SHOOT();
 			set_pit[GIMBAL_Below] = rc.CONTROLLER.ch2 * 30.0f / 660; //PITCH轴为绝对位置
 			set_yaw[GIMBAL_Below] = rc.CONTROLLER.ch1 * 30.0f / 660;
 			set_revolve_spd[GIMBAL_Below] = rc.CONTROLLER.ch4 * 1500.0f / 660;
@@ -95,8 +95,8 @@ void GET_Gimbal_Dir_xyw(void)
 			max_count = 0;
 			if (Vision_If_Update())
 			{
-				set_pit[GIMBAL_Below] = VisionRecvData.pitch_angle * visionK + cur_pit[GIMBAL_Below] + adjust_angle_pit;
-				set_yaw[GIMBAL_Below] = VisionRecvData.yaw_angle * visionK + cur_yaw[GIMBAL_Below] + adjust_angle_yaw;
+				set_pit[GIMBAL_Below] = VisionRecvData.pitch_angle * visionK  + adjust_angle_pit;
+				set_yaw[GIMBAL_Below] = VisionRecvData.yaw_angle * visionK  + adjust_angle_yaw;
 				//清楚视觉识别Flag
 				Clear_Vision_Get_Flag();
 			}
@@ -159,9 +159,9 @@ void Gimbal_PID_struct_init(void)
 					Gimbal_yaw_above_pid_KP, Gimbal_yaw_above_pid_KI, Gimbal_yaw_above_pid_KD); //yaw电机
 
 	//下云台
-	PID_struct_init(&pid_pit[GIMBAL_Below], POSITION_PID, 5000, 1000,
+	PID_struct_init(&pid_pit[GIMBAL_Below], POSITION_PID, 30, 0,
 					Gimbal_pitch_below_pid_KP, Gimbal_pitch_below_pid_KI, Gimbal_pitch_below_pid_KD); //pitch电机
-	PID_struct_init(&pid_yaw[GIMBAL_Below], POSITION_PID, 8000, 5000,
+	PID_struct_init(&pid_yaw[GIMBAL_Below], POSITION_PID, 30, 0,
 					Gimbal_yaw_below_pid_KP, Gimbal_yaw_below_pid_KI, Gimbal_yaw_below_pid_KD); //yaw电机
 
 	//下拨盘电机
@@ -170,10 +170,10 @@ void Gimbal_PID_struct_init(void)
 
 	//内环（速度）下yaw轴
 	PID_struct_init(&pid_yaw_spd[GIMBAL_Below],
-					DELTA_PID, 20000, 1000, 1, 0, 0.1); //yaw电机
+					POSITION_PID, 30000, 5000, 210, 2, 0); //yaw电机
 	//内环（速度）下pit轴
 	PID_struct_init(&pid_pit_spd[GIMBAL_Below],
-					DELTA_PID, 20000, 1000, 1, 0, 0); //pit电机
+					POSITION_PID, 30000, 5000, 200, 5, 0); //pit电机
 }
 
 void changeAutoRate()

@@ -119,13 +119,15 @@ int main(void)
   MX_I2C1_Init();
   /* USER CODE BEGIN 2 */
 
-  //系统初始�?
+
+  //系统初始化
   system_Init();
-  HAL_UART_Receive_DMA(&huart6, (uint8_t *)UART6_temp, VISION_RX_LENGTH);
-  // HAL_UART_Receive_IT(&huart6, (uint8_t *)UART6_temp, VISION_LENGTH); //视觉串口
-  HAL_UART_Receive_IT(&huart7, &ano_data_rec, 1); //串口7-匿名上位�?
+//  HAL_UART_Receive_DMA(&huart6, (uint8_t *)UART6_temp, VISION_RX_LENGTH);
+   HAL_UART_Receive_IT(&huart6, (uint8_t *)UART6_temp, VISION_RX_LENGTH); //视觉串口
+	 HAL_UART_Receive_IT(&huart7, &ano_data_rec, 1); //串口7-匿名上位机
 
   HAL_UART_Receive_IT(&huart8, JudgeTemp, 50);
+	
   /* USER CODE END 2 */
 
   /* Init scheduler */
@@ -202,8 +204,8 @@ void HAL_UART_RxCpltCallback(UART_HandleTypeDef *huart)
   if (huart->Instance == USART6)
   {
     Vision_Read_Data(UART6_temp);
-    // HAL_UART_Receive_IT(&huart6, (uint8_t *)UART6_temp, VISION_LENGTH);
-    HAL_UART_Receive_DMA(&huart6, (uint8_t *)UART6_temp, VISION_RX_LENGTH);
+     HAL_UART_Receive_IT(&huart6, (uint8_t *)UART6_temp, VISION_RX_LENGTH);
+//    HAL_UART_Receive_DMA(&huart6, (uint8_t *)UART6_temp, VISION_RX_LENGTH);
   }
   if (huart->Instance == UART7)
   {

@@ -56,6 +56,7 @@ typedef struct{
 	u32			  msg_cnt;
 }moto_measure_t;
 
+
 /* Extern  ------------------------------------------------------------------*/
 extern moto_measure_t  moto_chassis,moto_base[DJnumber];
 extern moto_measure_t  moto_yaw[2],moto_pit[2],moto_revolve[2],moto_info;

@@ -10,12 +10,15 @@
 #include "spi.h"
 #include "tim.h"
 #include "usart.h"
+
 #include "gpio.h"
 
-#define VISION_RX_LENGTH 20
-#define VISION_TX_LENGTH 23
+#define VISION_RX_LENGTH 25
+#define VISION_TX_LENGTH 25
 #define VISION_SOF 0xA5
 #define VISION_TOF 0xA6
+
+#define VISION_TIME_DELTA 116110812848148
 
 //STM32接收,直接将串口接收到的数据拷贝进结构体
 typedef __packed struct
@@ -25,19 +28,15 @@ typedef __packed struct
 	uint8_t CmdID; //指令
 
 	/* 数据 */
-	float yaw_angle;		 //例：100.1 33 33 C8 42
+	float yaw_angle;		 	 //例：100.1 33 33 C8 42
 	float pitch_angle;		 //注意：stm32 float为小端
-	float distance;			 //距离
-	uint8_t shoot_cmd;		 //是否开始射击  0  1-开始
-	uint8_t identify_target; //视野内是否有目标/是否识别到了目标   0否  1是
+	float distance;			 	 //距离
+	uint8_t shoot_cmd;		 //是否开始射击  0  1开始
+	uint8_t identify_target;//视野内是否有目标/是否识别到了目标   0否  1是
 	//预留
-	uint8_t blank_a;
-	uint8_t blank_b; 
-	uint8_t blank_c;
-
+	long long time; //视觉发来的时间戳
 	/* 尾 */
 	uint8_t TOF;
-
 } extVisionRecvData_t;
 
 //STM32发送,直接将打包好的数据一个字节一个字节地发送出去
@@ -58,6 +57,8 @@ typedef __packed struct
 	uint8_t blank_a;
 	uint8_t blank_b;
 	uint8_t blank_c;
+	uint8_t blank_e;
+	uint8_t blank_f;
 	/* 尾 */
 	uint8_t TOF;
 
@@ -67,7 +68,7 @@ extern extVisionRecvData_t VisionRecvData; //视觉接收结构体
 
 extern extVisionSendData_t VisionSendData; //视觉发送结构体
 
-extern uint8_t ReadTemp[20];
+extern uint8_t ReadTemp[VISION_RX_LENGTH];
 
 extern uint8_t Vision_Get_New_Data;
 
