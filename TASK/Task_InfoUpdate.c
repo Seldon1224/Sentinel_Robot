@@ -12,7 +12,7 @@ void Task_InfoUpdate(void *argument)
 		//2020.11.11新增，从can_receive修改到此
 		keyboard_scan();
 		GET_Control_Mode();
-		osDelay(3);
+		osDelay(1);
 	}
 }
 

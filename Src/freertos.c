@@ -249,12 +249,11 @@ void StartSendData(void *argument)
 * @retval None
 */
 /* USER CODE END Header_Task_500ms */
-uint8_t SendData[VISION_TX_LENGTH];
 void Task_500ms(void *argument)
 {
   /* USER CODE BEGIN Task_500ms */
   /* Infinite loop */
-	
+	uint8_t SendData[VISION_TX_LENGTH];
   for(;;)
   {
 			VisionSendData.SOF = 0xA5;
@@ -263,8 +262,8 @@ void Task_500ms(void *argument)
 //			memcpy(&VisionSendData.pitch_angle, &cur_pit[GIMBAL_Below], 4);
 		  VisionSendData.yaw_angle = cur_yaw[GIMBAL_Below];
 			VisionSendData.pitch_angle = cur_pit[GIMBAL_Below];
-			VisionSendData.yaw_speed = moto_yaw[1].speed_rpm;		 
-			VisionSendData.pitch_speed = moto_pit[1].speed_rpm;
+			VisionSendData.yaw_speed = moto_yaw[GIMBAL_Below].speed_rpm;		 
+			VisionSendData.pitch_speed = moto_pit[GIMBAL_Below].speed_rpm;
 			VisionSendData.target_mode = 0; //����ģʽ{ 0:��ͨ���� 1:���� 2:��������}
 			//Ԥ��
 			VisionSendData.blank_a = 0;
@@ -275,8 +274,8 @@ void Task_500ms(void *argument)
 			VisionSendData.TOF = 0xA6;
 			memcpy(SendData, &VisionSendData, VISION_TX_LENGTH);
 			HAL_UART_Transmit(&huart6, SendData, VISION_TX_LENGTH, 0xFF);
-		//1ms
-		osDelay(1);
+			//1ms
+			osDelay(1);
   }
   /* USER CODE END Task_500ms */
 }

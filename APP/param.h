@@ -11,7 +11,7 @@ typedef struct PID_parameter{
 #define Gimbal_pitch_below_pid_KI 0.0f
 #define Gimbal_pitch_below_pid_KD 0.0f
 
-#define Gimbal_yaw_below_pid_KP 15.0f
+#define Gimbal_yaw_below_pid_KP 2.5f
 #define Gimbal_yaw_below_pid_KI 0.0f
 #define Gimbal_yaw_below_pid_KD 0.0f
 

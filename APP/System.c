@@ -20,6 +20,8 @@ extern void system_ensable(void);
 void system_disable()
 {
 	Gun_Motor_Stop();
+	set_moto_current_all(&hcan1, 0, 0, 0, 0, 0);
+	set_moto_current_all(&hcan1, 1, 0, 0, 0, 0);
 	set_moto_current_all(&hcan1, 2, 0, 0, 0, 0);
 	vTaskSuspend(TASK_ChassisHandle); //将任务挂起
 	vTaskSuspend(TASK_GimbalHandle);

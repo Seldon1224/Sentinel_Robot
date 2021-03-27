@@ -5,8 +5,6 @@
 #include "string.h"
 #include "can.h"
 #include "./judge/CRC.h"
-#include "./NR_Printf/NR_Printf.h"
-
 #define LEN_HEADER 5 //帧头长
 #define LEN_CMDID 2	 //命令码长度
 #define LEN_TAIL 2	 //帧尾CRC16

@@ -7,13 +7,13 @@ void Gun_Motor_Init()
 	Gun_Motor_Stop();
 }
 
-//887-902 max 902
+//887-902 max902,²»ÒªËæ±ã³¬¹ý902
 void Gun_Motor_SHOOT()
 {
 	__HAL_TIM_SET_COMPARE(&htim5, TIM_CHANNEL_3, 860); 
 	__HAL_TIM_SET_COMPARE(&htim5, TIM_CHANNEL_4, 849); 
 }
-//stop 790
+//stop 790 
 void Gun_Motor_Stop()
 {
 	__HAL_TIM_SET_COMPARE(&htim5, TIM_CHANNEL_3, 790);

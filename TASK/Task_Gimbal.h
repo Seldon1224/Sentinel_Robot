@@ -15,9 +15,9 @@
 #define GIMBAL_Above 0
 #define GIMBAL_Below 1
 
-#define MAX_BELOW_YAW_ANGLE 50 //70max
-#define MAX_BELOW_PIT_ANGLE 40
-#define MIN_BELOW_PIT_ANGLE -70
+#define MAX_BELOW_YAW_ANGLE 40 //70max
+#define MAX_BELOW_PIT_ANGLE 20
+#define MIN_BELOW_PIT_ANGLE -30
 
 #define AUTO_RATE_VALUE (0.2f)
 
@@ -63,7 +63,8 @@ extern float set_pit[2];
 //当前值
 extern float cur_yaw[2];
 extern float cur_pit[2];
-
+extern float auto_rate_yaw;
+extern float auto_rate_pit;
 
 void changeAutoRate(void);
 void Task_Gimbal(void *argument);

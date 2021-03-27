@@ -15,7 +15,7 @@
 #include "Task_Gimbal.h"
 //底盘
 //键盘控制量
-#define V_max_ch 4000   //最大车速  mm/s
+#define V_max_ch 6000   //最大车速  mm/s
 #define V_min_ch 0      //最小车速	mm/s
 
 //电机相关
@@ -23,7 +23,7 @@
 #define CHASSIS_DIR_NO_MOVE 0
 #define CHASSIS_DIR_LEFT    1
 #define CHASSIS_DIR_RIGHT   2
-
+#define CHASSIS_SPEED_AUTO_MAX 4000
 
 typedef enum
 {
@@ -32,7 +32,8 @@ typedef enum
 } ADD_AccXYW_ENABLE;
 
 extern uint8_t max_count;
-
+extern int switch_state[2];
+extern int32_t set_chassis;
 void Task_Chassis(void *argument);
 void GET_Control_Mode(void);
 void GET_Chassis_Enable_Flag(void);
